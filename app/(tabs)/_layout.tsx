@@ -4,12 +4,12 @@ import { useThemeColor } from '../../hooks/useThemeColor';
 import { Platform, View } from 'react-native';
 
 export default function TabLayout() {
-  const tintColor = useThemeColor('tint');
-  
+  //const tintColor = useThemeColor('tint');
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: tintColor,
+        tabBarActiveTintColor: '#cccccc',
         tabBarInactiveTintColor: '#666666',
         headerShown: false,
         tabBarShowLabel: false,
@@ -35,9 +35,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ color, focused }) => (
             <View style={{ marginBottom: Platform.OS === 'ios' ? -10 : 0 }}>
-              <Ionicons name="stats-chart" size={28} color={color} />
+              <Ionicons name="stats-chart" size={28} color={color} style={{ transform: focused ? [{ scale: 1.2 }] : [{ scale: 1 }] }} />
             </View>
           ),
         }}
@@ -45,9 +45,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="sessions"
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ color, focused }) => (
             <View style={{ marginBottom: Platform.OS === 'ios' ? -10 : 0 }}>
-              <Ionicons name="calendar" size={28} color={color} />
+              <Ionicons name="calendar" size={28} color={color} style={{ transform: focused ? [{ scale: 1.2 }] : [{ scale: 1 }] }} />
             </View>
           ),
         }}
@@ -55,9 +55,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ color, focused }) => (
             <View style={{ marginBottom: Platform.OS === 'ios' ? -10 : 0 }}>
-              <Ionicons name="settings-outline" size={28} color={color} />
+              <Ionicons name="settings" size={28} color={color} style={{ transform: focused ? [{ scale: 1.2 }] : [{ scale: 1 }] }} />
             </View>
           ),
         }}
