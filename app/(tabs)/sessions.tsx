@@ -102,7 +102,7 @@ export default function SessionsScreen() {
       )}
 
       <TouchableOpacity
-        style={[styles.addButton, { backgroundColor: tintColor }]}
+        style={[styles.addButton, { backgroundColor: '#666666' }]}
         onPress={handleAddSession}
       >
         <Ionicons name="add" size={24} color="#fff" />

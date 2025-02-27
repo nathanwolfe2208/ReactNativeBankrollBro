@@ -29,6 +29,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     headers: {
       'X-Client-Info': 'poker-bankroll-tracker',
     },
+    fetch: (url, options) => {
+      return fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(30000)
+      });
+    }
   },
   // Add better network timeout handling
   db: {
@@ -40,12 +46,4 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     },
   },
   // Add request timeout configuration
-  httpClient: {
-    fetch: (url, options) => {
-      return fetch(url, {
-        ...options,
-        signal: AbortSignal.timeout(30000), // 30 second timeout
-      });
-    },
-  },
 });

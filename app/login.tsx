@@ -21,7 +21,7 @@ export default function Login() {
       });
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert('Error', error.message);
       setLoading(false);
     }
@@ -51,7 +51,7 @@ export default function Login() {
         // Auto sign in after successful signup
         await signInWithEmail();
       }
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert('Error', error.message);
       setLoading(false);
     }

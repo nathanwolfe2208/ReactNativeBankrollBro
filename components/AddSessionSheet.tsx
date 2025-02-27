@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {
   View,
   Text,
@@ -146,13 +147,26 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
         </View>
 
         <View style={styles.formGroup}>
-          <Text style={styles.label}>Date</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.date}
-            onChangeText={(value) => handleChange('date', value)}
-            placeholder="YYYY-MM-DD"
-          />
+            <Text style={styles.label}>Date</Text>
+            {Platform.OS === 'ios' ? (
+                <DateTimePicker
+                    value={new Date(formData.date || Date.now())}
+                    mode="date"
+                    display="inline"  // or "spinner" for older iOS versions
+                    onChange={(event: any, selectedDate: { toISOString: () => string; } | undefined) => {
+                        const isoDate = selectedDate?.toISOString().split('T')[0];
+                        handleChange('date', isoDate ?? '');
+                    }}
+                    style={styles.datePicker}
+            />
+            ) : (
+                <TextInput
+                    style={styles.input}
+                    value={formData.date}
+                    onChangeText={(value) => handleChange('date', value)}
+                    placeholder="YYYY-MM-DD"
+                />
+             )}
         </View>
 
         <View style={styles.formGroup}>
@@ -301,4 +315,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  datePicker: {
+    width: '100%',
+    marginTop: 8,
+  }
 });
