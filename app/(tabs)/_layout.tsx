@@ -2,11 +2,12 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { Platform, View, Text, StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 export default function TabLayout() {
   //const tintColor = useThemeColor('tint');
 
   return (
-    
+   <GestureHandlerRootView>
     <View style={{ flex: 1 }}>
       {/* Persistent Header */}
       <View style={styles.header}>
@@ -70,12 +71,13 @@ export default function TabLayout() {
         />
       </Tabs>
     </View>
+    </GestureHandlerRootView> 
   );
 }
 
 const styles = StyleSheet.create({
   header: {
-    height: 60,
+    height: 70,
     justifyContent: 'center',
     alignItems: 'flex-start',
     backgroundColor: '#f8f9fa', // Change this to your desired header color

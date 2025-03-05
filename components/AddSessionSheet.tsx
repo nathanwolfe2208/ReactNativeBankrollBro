@@ -14,7 +14,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../lib/supabase';
 import { useThemeColor } from '../hooks/useThemeColor';
 import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
-import { Session } from './SessionCard';
 
 type AddSessionSheetProps = {
   isVisible: boolean;
@@ -37,10 +36,11 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
     notes: '',
   });
 
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   const snapPoints = ['75%'];
 
   useEffect(() => {
-    // Use a timeout to avoid the findDOMNode warning
     const timer = setTimeout(() => {
       if (isVisible) {
         bottomSheetRef.current?.expand();
@@ -110,11 +110,9 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
       Alert.alert('Error', error.message || 'Failed to add session');
     } finally {
       setLoading(false);
-
     }
   };
 
-  // Custom backdrop component to avoid findDOMNode warnings
   const renderBackdrop = React.useCallback(
     (props: any) => (
       <BottomSheetBackdrop
@@ -125,6 +123,18 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
     ),
     []
   );
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || new Date(formData.date);
+    
+    // On Android, the picker is dismissed automatically
+    setShowDatePicker(Platform.OS === 'ios');
+    
+    if (selectedDate) {
+      const isoDate = currentDate.toISOString().split('T')[0];
+      handleChange('date', isoDate);
+    }
+  };
 
   return (
     <BottomSheet
@@ -147,26 +157,49 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
         </View>
 
         <View style={styles.formGroup}>
-            <Text style={styles.label}>Date</Text>
-            {Platform.OS === 'ios' ? (
-                <DateTimePicker
-                    value={new Date(formData.date || Date.now())}
-                    mode="date"
-                    display="inline"  // or "spinner" for older iOS versions
-                    onChange={(event: any, selectedDate: { toISOString: () => string; } | undefined) => {
-                        const isoDate = selectedDate?.toISOString().split('T')[0];
-                        handleChange('date', isoDate ?? '');
-                    }}
-                    style={styles.datePicker}
+          <Text style={styles.label}>Date</Text>
+          <TouchableOpacity 
+            onPress={() => setShowDatePicker(true)}
+            style={styles.datePickerButton}
+          >
+            <TextInput
+              style={styles.input}
+              value={formData.date}
+              placeholder="YYYY-MM-DD"
+              editable={false} // Make the TextInput non-editable
             />
-            ) : (
-                <TextInput
-                    style={styles.input}
-                    value={formData.date}
-                    onChangeText={(value) => handleChange('date', value)}
-                    placeholder="YYYY-MM-DD"
-                />
-             )}
+            <Ionicons name="calendar-outline" size={20} color="#666" style={styles.calendarIcon} />
+          </TouchableOpacity>
+          
+          {Platform.OS === 'ios' && showDatePicker && (
+            <View style={styles.iosPickerContainer}>
+              <View style={styles.iosPickerHeader}>
+                <TouchableOpacity 
+                  onPress={() => setShowDatePicker(false)}
+                  style={styles.iosDoneButton}
+                >
+                  <Text style={[styles.iosDoneButtonText, { color: tintColor }]}>Done</Text>
+                </TouchableOpacity>
+              </View>
+              <DateTimePicker
+                value={new Date(formData.date || Date.now())}
+                mode="date"
+                display="spinner"
+                maximumDate={ new Date()}
+                onChange={onDateChange}
+                style={styles.iosPicker}
+              />
+            </View>
+          )}
+          
+          {Platform.OS === 'android' && showDatePicker && (
+            <DateTimePicker
+              value={new Date(formData.date || Date.now())}
+              mode="date"
+              display="default"
+              onChange={onDateChange}
+            />
+          )}
         </View>
 
         <View style={styles.formGroup}>
@@ -276,6 +309,7 @@ const styles = StyleSheet.create({
   },
   formGroup: {
     marginBottom: 16,
+    width: '100%',
   },
   label: {
     fontSize: 14,
@@ -315,8 +349,43 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  datePicker: {
+  datePickerButton: {
+    position: 'relative',
     width: '100%',
+  },
+  calendarIcon: {
+    position: 'absolute',
+    right: 12,
+    top: 12,
+  },
+  iosPickerContainer: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
     marginTop: 8,
-  }
+    borderWidth: 1,
+    borderColor: '#e1e1e1',
+    overflow: 'hidden',
+    width: '100%',
+  },
+  iosPickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e1e1e1',
+    backgroundColor: '#fff',
+    width: '100%',
+  },
+  iosDoneButton: {
+    padding: 4,
+  },
+  iosDoneButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  iosPicker: {
+    backgroundColor: '#fff',
+    width: '100%',
+    height: 200,  // Set a fixed height for the picker
+  },
 });
