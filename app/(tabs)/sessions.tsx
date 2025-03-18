@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AddSessionSheet } from '../../components/AddSessionSheet';
 import { supabase } from '../../lib/supabase';
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { Filters, FilterSheet } from '@/components/FilterSheet';
 
 export default function SessionsScreen() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function SessionsScreen() {
   const [loading, setLoading] = useState(true);
   const [isAddSessionVisible, setIsAddSessionVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [isFilterSheetVisible, setIsFilterSheetVisible] = useState(false);
 
   const fetchSessions = async () => {
     try {
@@ -62,13 +64,39 @@ export default function SessionsScreen() {
     setIsAddSessionVisible(true);
   };
 
+  const handleFilterSession = () => {
+    setIsFilterSheetVisible(true);
+  };
+
   const handleCloseAddSession = () => {
     setIsAddSessionVisible(false);
+  };
+
+  const handleCloseFilterSession = () => {
+    setIsFilterSheetVisible(false);
   };
 
   const handleSessionAdded = () => {
     fetchSessions();
   };
+
+  function filterSessions(filters: Filters) {
+    // TODO: IMPLEMENT THE REST OF THE FILTERING
+    if (filters.dateRange !== null && filters.dateRange instanceof Date) {
+      
+      const filteredSessions = sessions.filter(session => {
+        const sessionDate = new Date(session.date);
+        return sessionDate > filters.dateRange!; 
+      });
+  
+      console.log('Filtering by date range:', filters.dateRange);
+      console.log('Filtered sessions:', filteredSessions);
+      
+      setSessions(filteredSessions);
+    } else {
+      fetchSessions();
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -102,6 +130,13 @@ export default function SessionsScreen() {
       )}
 
       <TouchableOpacity
+        style={[styles.configButton, { backgroundColor: '#666666' }]}
+        onPress={handleFilterSession}
+      >
+        <Ionicons name="options" size={24} color="#fff" />
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={[styles.addButton, { backgroundColor: '#666666' }]}
         onPress={handleAddSession}
       >
@@ -112,6 +147,12 @@ export default function SessionsScreen() {
         isVisible={isAddSessionVisible}
         onClose={handleCloseAddSession}
         onSessionAdded={handleSessionAdded}
+      />
+
+      <FilterSheet
+        isVisible={isFilterSheetVisible}
+        onClose={handleCloseFilterSession}
+        onFilterApplied={filterSessions}
       />
     </View>
   );
@@ -136,6 +177,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 24,
     right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  configButton: {
+    position: 'absolute',
+    bottom: 24,
+    left: 24,
     width: 56,
     height: 56,
     borderRadius: 28,

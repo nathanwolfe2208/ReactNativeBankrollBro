@@ -11,28 +11,85 @@ import {
   Line,
   Tooltip,
 } from 'recharts';
+import { supabase } from '@/lib/supabase';
+import { Session } from '@/components/SessionCard';
+import { useEffect, useState } from 'react';
+import { StateCard } from '@/components/StatCard';
 
 export default function DashboardScreen() {
   const tintColor = useThemeColor('tint');
   const screenWidth = Dimensions.get('window').width;
 
-  const chartData = [
-    { name: 'Jan', value: 1200 },
-    { name: 'Feb', value: 1900 },
-    { name: 'Mar', value: 1500 },
-    { name: 'Apr', value: 2800 },
-    { name: 'May', value: 2100 },
-    { name: 'Jun', value: 3000 },
-  ];
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const nativeChartData = {
-    labels: chartData.map(d => d.name),
-    datasets: [
-      {
-        data: chartData.map(d => d.value),
-      },
-    ],
-  };
+  // const chartData = [
+  //   { name: 'Jan', value: 1200 },
+  //   { name: 'Feb', value: 1900 },
+  //   { name: 'Mar', value: 1500 },
+  //   { name: 'Apr', value: 2800 },
+  //   { name: 'May', value: 2100 },
+  //   { name: 'Jun', value: 3000 },
+  // ];
+
+  // const nativeChartData = {
+  //   labels: chartData.map(d => d.name),
+  //   datasets: [
+  //     {
+  //       data: chartData.map(d => d.value),
+  //     },
+  //   ],
+  // };
+
+  const fetchSessions = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('sessions')
+          .select('*')
+          .order('date', { ascending: false });
+  
+        if (error) throw error;
+  
+        if (data) {
+          const formattedSessions: Session[] = data.map(session => ({
+            id: session.id,
+            date: session.date,
+            location: session.location,
+            buyIn: session.buy_in,
+            cashOut: session.cash_out,
+            duration: session.duration,
+            gameType: session.game_type,
+          }));
+          setSessions(formattedSessions);
+        }
+      } catch (error) {
+        console.error('Error fetching sessions:', error);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    };
+
+    const chartData = sessions.map(session => ({
+      name: session.date,
+      value: session.cashOut - session.buyIn,
+    }));
+    
+    const nativeChartData = {
+      labels: chartData.map(d => d.name),
+      datasets: [
+        {
+          data: chartData.map(d => d.value),
+          color: (opacity = 1) => tintColor, // optional
+          strokeWidth: 2, // optional
+        },
+      ],
+    };
+
+    useEffect(() => {
+      fetchSessions();
+    }, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -47,7 +104,6 @@ export default function DashboardScreen() {
           <View style={{ height: 220, width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
               <WebLineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
@@ -86,18 +142,9 @@ export default function DashboardScreen() {
       </View>
 
       <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>32</Text>
-          <Text style={styles.statLabel}>Total Sessions</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>68%</Text>
-          <Text style={styles.statLabel}>Win Rate</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>4.2h</Text>
-          <Text style={styles.statLabel}>Avg Session</Text>
-        </View>
+        <StateCard label="Total Sessions" value="32" />
+        <StateCard label="Total Profit" value="$3,000" />
+        <StateCard label="Avg. Profit" value="$94" />
       </View>
     </ScrollView>
   );
@@ -113,52 +160,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 18, // Increased size for better visibility
+    fontWeight: '500', // Lighter weight for a modern look
+    color: '#333', // Darker color for contrast
     marginBottom: 8,
+    letterSpacing: 0.5, // Added letter spacing
   },
   balance: {
-    fontSize: 36,
+    fontSize: 40, // Increased size for emphasis
     fontWeight: '700',
     marginBottom: 4,
+    color: '#2c3e50', // Darker color for a modern touch
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    color: '#7f8c8d', // Softer color for a modern feel
   },
   chartContainer: {
     backgroundColor: '#fff',
     padding: 16,
     marginTop: 16,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 16,
-  },
-  statCard: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    flex: 1,
-    marginHorizontal: 4,
-    alignItems: 'center',
+    borderRadius: 12, // Added border radius for a softer look
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 3.84,
+    shadowRadius: 4,
     elevation: 5,
   },
-  statValue: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#666',
-  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+  }
 });
