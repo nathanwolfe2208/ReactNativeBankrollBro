@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
 import { SessionCard, Session } from '../../components/SessionCard';
 import { useRouter, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,7 +22,7 @@ export default function SessionsScreen() {
 
   // Use Zustand store
   const { sessions, fetchSessions, addSession } = useSessionsStore();
-  
+
   const [loading, setLoading] = useState(true);
   const [isAddSessionVisible, setIsAddSessionVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -54,6 +61,10 @@ export default function SessionsScreen() {
     fetchAndSetSessions(); // Optionally refresh the sessions
   };
 
+  const handleFilterSession = () => {
+    setIsFilterSheetVisible(true);
+  };
+
   const handleCloseFilterSession = () => {
     setIsFilterSheetVisible(false);
   };
@@ -74,10 +85,7 @@ export default function SessionsScreen() {
         <FlatList
           data={sessions}
           renderItem={({ item }) => (
-            <SessionCard
-              session={item}
-              onPress={handleSessionPress}
-            />
+            <SessionCard session={item} onPress={handleSessionPress} />
           )}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
@@ -97,7 +105,7 @@ export default function SessionsScreen() {
 
       <TouchableOpacity
         style={[styles.configButton, { backgroundColor: '#666666' }]}
-        onPress={handleCloseFilterSession}
+        onPress={handleFilterSession}
       >
         <Ionicons name="options" size={24} color="#fff" />
       </TouchableOpacity>
@@ -121,7 +129,7 @@ export default function SessionsScreen() {
         onFilterApplied={filterSessions}
       />
     </View>
- );
+  );
 }
 
 const styles = StyleSheet.create({

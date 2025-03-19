@@ -13,7 +13,10 @@ export default function RootLayout() {
     // Add error handling for the initial session check
     const checkSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
         if (error) {
           console.error('Error checking session:', error.message);
         }
@@ -27,7 +30,9 @@ export default function RootLayout() {
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
@@ -47,19 +52,19 @@ export default function RootLayout() {
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen 
-          name="login" 
-          options={{ 
+        <Stack.Screen
+          name="login"
+          options={{
             headerShown: false,
-            gestureEnabled: false
-          }} 
+            gestureEnabled: false,
+          }}
           redirect={session ? true : false}
         />
-        <Stack.Screen 
-          name="(tabs)" 
-          options={{ 
+        <Stack.Screen
+          name="(tabs)"
+          options={{
             headerShown: false,
-            gestureEnabled: false
+            gestureEnabled: false,
           }}
           redirect={!session ? true : false}
         />

@@ -10,7 +10,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '../hooks/useThemeColor';
-import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 
 type FilterSheetProps = {
   isVisible: boolean;
@@ -19,17 +22,21 @@ type FilterSheetProps = {
 };
 
 export type Filters = {
-    location: string;
-    gameType: string;
-    dateRange: Date | string | null ;
-}
+  location: string;
+  gameType: string;
+  dateRange: Date | string | null;
+};
 
-export function FilterSheet({ isVisible, onClose, onFilterApplied }: FilterSheetProps) {
+export function FilterSheet({
+  isVisible,
+  onClose,
+  onFilterApplied,
+}: FilterSheetProps) {
   const tintColor = useThemeColor('tint');
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [loading, setLoading] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState('all');
-  
+
   const [filters, setFilters] = useState<Filters>({
     location: '',
     gameType: '',
@@ -46,7 +53,7 @@ export function FilterSheet({ isVisible, onClose, onFilterApplied }: FilterSheet
         bottomSheetRef.current?.close();
       }
     }, 0);
-    
+
     return () => clearTimeout(timer);
   }, [isVisible]);
 
@@ -96,7 +103,7 @@ export function FilterSheet({ isVisible, onClose, onFilterApplied }: FilterSheet
         appearsOnIndex={0}
       />
     ),
-    []
+    [],
   );
 
   return (
@@ -142,25 +149,29 @@ export function FilterSheet({ isVisible, onClose, onFilterApplied }: FilterSheet
         <View style={styles.formGroup}>
           <Text style={styles.label}>Date Range</Text>
           <View style={styles.dateRangeContainer}>
-            {['1 month', '3 months', '6 months', '1 year', 'All'].map((range) => (
-              <TouchableOpacity
-                key={range}
-                style={[
-                  styles.dateRangeButton,
-                  selectedDateRange === range && styles.selectedDateRangeButton,
-                ]}
-                onPress={() => handleChange('dateRange', range)}
-              >
-                <Text
+            {['1 month', '3 months', '6 months', '1 year', 'All'].map(
+              (range) => (
+                <TouchableOpacity
+                  key={range}
                   style={[
-                    styles.dateRangeButtonText,
-                    selectedDateRange === range && styles.selectedDateRangeButtonText,
+                    styles.dateRangeButton,
+                    selectedDateRange === range &&
+                      styles.selectedDateRangeButton,
                   ]}
+                  onPress={() => handleChange('dateRange', range)}
                 >
-                  {range}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    style={[
+                      styles.dateRangeButtonText,
+                      selectedDateRange === range &&
+                        styles.selectedDateRangeButtonText,
+                    ]}
+                  >
+                    {range}
+                  </Text>
+                </TouchableOpacity>
+              ),
+            )}
           </View>
         </View>
 

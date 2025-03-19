@@ -12,7 +12,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '../hooks/useThemeColor';
-import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 import useSessionsStore from '@/state'; // Import Zustand store
 import { Session } from './SessionCard';
 
@@ -22,11 +25,14 @@ type AddSessionSheetProps = {
   //onSessionAdded: (Session: Session) => Promise<void>;
 };
 
-export function AddSessionSheet({ isVisible, onClose, /*onSessionAdded*/ }: AddSessionSheetProps) {
+export function AddSessionSheet({
+  isVisible,
+  onClose /*onSessionAdded*/,
+}: AddSessionSheetProps) {
   const tintColor = useThemeColor('tint');
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     location: '',
     gameType: '',
@@ -49,7 +55,7 @@ export function AddSessionSheet({ isVisible, onClose, /*onSessionAdded*/ }: AddS
         bottomSheetRef.current?.close();
       }
     }, 0);
-    
+
     return () => clearTimeout(timer);
   }, [isVisible]);
 
@@ -100,7 +106,7 @@ export function AddSessionSheet({ isVisible, onClose, /*onSessionAdded*/ }: AddS
         date: new Date().toISOString().split('T')[0],
         notes: '',
       });
-      
+
       //onSessionAdded();
       onClose();
     } catch (error: any) {
@@ -118,14 +124,14 @@ export function AddSessionSheet({ isVisible, onClose, /*onSessionAdded*/ }: AddS
         appearsOnIndex={0}
       />
     ),
-    []
+    [],
   );
 
   const onDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || new Date(formData.date);
-    
+
     setShowDatePicker(Platform.OS === 'ios');
-    
+
     if (selectedDate) {
       const isoDate = currentDate.toISOString().split('T')[0];
       handleChange('date', isoDate);
@@ -154,7 +160,7 @@ export function AddSessionSheet({ isVisible, onClose, /*onSessionAdded*/ }: AddS
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>Date</Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => setShowDatePicker(true)}
             style={styles.datePickerButton}
           >
@@ -164,17 +170,26 @@ export function AddSessionSheet({ isVisible, onClose, /*onSessionAdded*/ }: AddS
               placeholder="YYYY-MM-DD"
               editable={false}
             />
-            <Ionicons name="calendar-outline" size={20} color="#666" style={styles.calendarIcon} />
+            <Ionicons
+              name="calendar-outline"
+              size={20}
+              color="#666"
+              style={styles.calendarIcon}
+            />
           </TouchableOpacity>
-          
+
           {Platform.OS === 'ios' && showDatePicker && (
             <View style={styles.iosPickerContainer}>
               <View style={styles.iosPickerHeader}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => setShowDatePicker(false)}
                   style={styles.iosDoneButton}
                 >
-                  <Text style={[styles.iosDoneButtonText, { color: tintColor }]}>Done</Text>
+                  <Text
+                    style={[styles.iosDoneButtonText, { color: tintColor }]}
+                  >
+                    Done
+                  </Text>
                 </TouchableOpacity>
               </View>
               <DateTimePicker
@@ -187,7 +202,7 @@ export function AddSessionSheet({ isVisible, onClose, /*onSessionAdded*/ }: AddS
               />
             </View>
           )}
-          
+
           {Platform.OS === 'android' && showDatePicker && (
             <DateTimePicker
               value={new Date(formData.date || Date.now())}
@@ -274,11 +289,11 @@ export function AddSessionSheet({ isVisible, onClose, /*onSessionAdded*/ }: AddS
           onPress={handleSubmit}
           disabled={!isFormValid() || loading}
         >
- {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.submitButtonText}>Save Session</Text>
-            )}
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.submitButtonText}>Save Session</Text>
+          )}
         </TouchableOpacity>
       </BottomSheetScrollView>
     </BottomSheet>

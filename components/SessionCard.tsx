@@ -24,9 +24,7 @@ export function SessionCard({ session, onPress }: SessionCardProps) {
   const isProfit = profit >= 0;
 
   return (
-    <Pressable
-      style={styles.container}
-      onPress={() => onPress(session)}>
+    <Pressable style={styles.container} onPress={() => onPress(session)}>
       <View style={styles.header}>
         <Text style={styles.date}>{session.date}</Text>
         <Text style={styles.location}>{session.location}</Text>
@@ -38,10 +36,8 @@ export function SessionCard({ session, onPress }: SessionCardProps) {
         </View>
         <View style={styles.profitContainer}>
           <Text
-            style={[
-              styles.profit,
-              { color: isProfit ? '#34C759' : '#FF3B30' },
-            ]}>
+            style={[styles.profit, { color: isProfit ? '#34C759' : '#FF3B30' }]}
+          >
             {isProfit ? '+' : '-'}${Math.abs(profit)}
           </Text>
         </View>

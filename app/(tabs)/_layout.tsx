@@ -7,71 +7,93 @@ export default function TabLayout() {
   //const tintColor = useThemeColor('tint');
 
   return (
-   <GestureHandlerRootView>
-    <View style={{ flex: 1 }}>
-      {/* Persistent Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>BB</Text>
-      </View>
+    <GestureHandlerRootView>
+      <View style={{ flex: 1 }}>
+        {/* Persistent Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>BB</Text>
+        </View>
 
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: '#cccccc',
-          tabBarInactiveTintColor: '#666666',
-          headerShown: false,
-          tabBarShowLabel: false,
-          tabBarStyle: Platform.select({
-            ios: {
-              backgroundColor: '#FFFFFF',
-              borderTopWidth: 1,
-              borderTopColor: '#E5E5EA',
-              height: 90,
-              paddingBottom: 30,
-              paddingTop: 10,
-            },
-            default: {
-              backgroundColor: '#FFFFFF',
-              borderTopWidth: 1,
-              borderTopColor: '#E5E5EA',
-              height: 65,
-              paddingBottom: 10,
-              paddingTop: 10,
-            },
-          }),
-        }}>
-        <Tabs.Screen
-          name="index"
-          options={{
-            tabBarIcon: ({ color, focused }) => (
-              <View style={{ marginBottom: Platform.OS === 'ios' ? -10 : 0 }}>
-                <Ionicons name="stats-chart" size={28} color={color} style={{ transform: focused ? [{ scale: 1.2 }] : [{ scale: 1 }] }} />
-              </View>
-            ),
+        <Tabs
+          screenOptions={{
+            tabBarActiveTintColor: '#cccccc',
+            tabBarInactiveTintColor: '#666666',
+            headerShown: false,
+            tabBarShowLabel: false,
+            tabBarStyle: Platform.select({
+              ios: {
+                backgroundColor: '#FFFFFF',
+                borderTopWidth: 1,
+                borderTopColor: '#E5E5EA',
+                height: 90,
+                paddingBottom: 30,
+                paddingTop: 10,
+              },
+              default: {
+                backgroundColor: '#FFFFFF',
+                borderTopWidth: 1,
+                borderTopColor: '#E5E5EA',
+                height: 65,
+                paddingBottom: 10,
+                paddingTop: 10,
+              },
+            }),
           }}
-        />
-        <Tabs.Screen
-          name="sessions"
-          options={{
-            tabBarIcon: ({ color, focused }) => (
-              <View style={{ marginBottom: Platform.OS === 'ios' ? -10 : 0 }}>
-                <Ionicons name="calendar" size={28} color={color} style={{ transform: focused ? [{ scale: 1.2 }] : [{ scale: 1 }] }} />
-              </View>
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="settings"
-          options={{
-            tabBarIcon: ({ color, focused }) => (
-              <View style={{ marginBottom: Platform.OS === 'ios' ? -10 : 0 }}>
-                <Ionicons name="settings" size={28} color={color} style={{ transform: focused ? [{ scale: 1.2 }] : [{ scale: 1 }] }} />
-              </View>
-            ),
-          }}
-        />
-      </Tabs>
-    </View>
-    </GestureHandlerRootView> 
+        >
+          <Tabs.Screen
+            name="index"
+            options={{
+              tabBarIcon: ({ color, focused }) => (
+                <View style={{ marginBottom: Platform.OS === 'ios' ? -10 : 0 }}>
+                  <Ionicons
+                    name="stats-chart"
+                    size={28}
+                    color={color}
+                    style={{
+                      transform: focused ? [{ scale: 1.2 }] : [{ scale: 1 }],
+                    }}
+                  />
+                </View>
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="sessions"
+            options={{
+              tabBarIcon: ({ color, focused }) => (
+                <View style={{ marginBottom: Platform.OS === 'ios' ? -10 : 0 }}>
+                  <Ionicons
+                    name="calendar"
+                    size={28}
+                    color={color}
+                    style={{
+                      transform: focused ? [{ scale: 1.2 }] : [{ scale: 1 }],
+                    }}
+                  />
+                </View>
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="settings"
+            options={{
+              tabBarIcon: ({ color, focused }) => (
+                <View style={{ marginBottom: Platform.OS === 'ios' ? -10 : 0 }}>
+                  <Ionicons
+                    name="settings"
+                    size={28}
+                    color={color}
+                    style={{
+                      transform: focused ? [{ scale: 1.2 }] : [{ scale: 1 }],
+                    }}
+                  />
+                </View>
+              ),
+            }}
+          />
+        </Tabs>
+      </View>
+    </GestureHandlerRootView>
   );
 }
 

@@ -21,25 +21,30 @@ export default function DashboardScreen() {
 
   // Use Zustand store
   const { sessions, fetchSessions } = useSessionsStore();
-  
-  const chartData = sessions.map(session => ({
+
+  const chartData = sessions.map((session) => ({
     name: session.date,
     value: session.cashOut - session.buyIn,
   }));
-  
+
   const nativeChartData = {
-    labels: chartData.map(d => d.name),
+    labels: chartData.map((d) => d.name),
     datasets: [
       {
-        data: chartData.map(d => d.value),
+        data: chartData.map((d) => d.value),
         color: (opacity = 1) => tintColor, // optional
         strokeWidth: 2, // optional
       },
     ],
   };
 
+  const totalBR = sessions.reduce((acc, session) => {
+    return acc + (session.cashOut - session.buyIn);
+  }, 0);
+  const avgProfit = totalBR / sessions.length;
+
   useEffect(() => {
-    fetchSessions(); // Fetch sessions when the component mounts
+    fetchSessions();
   }, [fetchSessions]);
 
   return (
@@ -54,7 +59,10 @@ export default function DashboardScreen() {
         {Platform.OS === 'web' ? (
           <View style={{ height: 220, width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <WebLineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <WebLineChart
+                data={chartData}
+                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+              >
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
@@ -94,8 +102,11 @@ export default function DashboardScreen() {
 
       <View style={styles.statsContainer}>
         <StateCard label="Total Sessions" value={sessions.length.toString()} />
-        <StateCard label="Total Profit" value="$3,000" />
-        <StateCard label="Avg. Profit" value="$94" />
+        <StateCard label="Total Profit" value={totalBR.toString()} />
+        <StateCard
+          label="Avg. Profit"
+          value={avgProfit.toFixed(1).toString()}
+        />
       </View>
     </ScrollView>
   );
@@ -145,5 +156,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 16,
-  }
+  },
 });

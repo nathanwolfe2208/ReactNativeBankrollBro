@@ -1,5 +1,15 @@
 import { useState } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, Text, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { supabase } from '../lib/supabase';
 
 export default function Login() {
@@ -60,7 +70,8 @@ export default function Login() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}>
+      style={styles.container}
+    >
       <View style={styles.content}>
         <Text style={styles.title}>Poker Bankroll Tracker</Text>
         <View style={styles.inputContainer}>
@@ -89,9 +100,14 @@ export default function Login() {
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={[styles.button, styles.signInButton, loading && styles.buttonDisabled]}
+            style={[
+              styles.button,
+              styles.signInButton,
+              loading && styles.buttonDisabled,
+            ]}
             onPress={signInWithEmail}
-            disabled={loading}>
+            disabled={loading}
+          >
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
@@ -99,9 +115,14 @@ export default function Login() {
             )}
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.button, styles.signUpButton, loading && styles.buttonDisabled]}
+            style={[
+              styles.button,
+              styles.signUpButton,
+              loading && styles.buttonDisabled,
+            ]}
             onPress={signUpWithEmail}
-            disabled={loading}>
+            disabled={loading}
+          >
             {loading ? (
               <ActivityIndicator color="#2f95dc" />
             ) : (

@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Pressable, Alert, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Alert,
+  Platform,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'expo-router';
@@ -31,44 +38,40 @@ export default function SettingsScreen() {
   const handleLogout = async () => {
     try {
       console.log('Logging out...');
-      if(Platform.OS === 'ios'){
-        Alert.alert(
-          "Confirm Logout",
-          "Are you sure you want to log out?",
-          [
-            {
-              text: "Cancel",
-              style: "cancel"
-            },
-            {
-              text: "Logout",
-              style: "destructive",
-              onPress: async () => {
-                console.log('User  confirmed logout');
-                const { error } = await supabase.auth.signOut();
-                if (error) {
-                  console.error('Logout error:', error.message);
-                  Alert.alert('Error', error.message);
-                } else {
-                  console.log('User  logged out successfully');
-                  // Optionally navigate to login screen here if not using auth state listener
-                  // router.replace('/login'); // Uncomment if needed
-                }
+      if (Platform.OS === 'ios') {
+        Alert.alert('Confirm Logout', 'Are you sure you want to log out?', [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Logout',
+            style: 'destructive',
+            onPress: async () => {
+              console.log('User  confirmed logout');
+              const { error } = await supabase.auth.signOut();
+              if (error) {
+                console.error('Logout error:', error.message);
+                Alert.alert('Error', error.message);
+              } else {
+                console.log('User  logged out successfully');
+                // Optionally navigate to login screen here if not using auth state listener
+                // router.replace('/login'); // Uncomment if needed
               }
-            }
-          ]
-      );
-    } else {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Logout error:', error.message);
-        Alert.alert('Error', error.message);
+            },
+          },
+        ]);
       } else {
-        console.log('User  logged out successfully');
-        // Optionally navigate to login screen here if not using auth state listener
-        // router.replace('/login'); // Uncomment if needed
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.error('Logout error:', error.message);
+          Alert.alert('Error', error.message);
+        } else {
+          console.log('User  logged out successfully');
+          // Optionally navigate to login screen here if not using auth state listener
+          // router.replace('/login'); // Uncomment if needed
+        }
       }
-    }
     } catch (error: any) {
       console.error('Error during logout:', error.message);
       Alert.alert('Error', error.message || 'Failed to log out');
