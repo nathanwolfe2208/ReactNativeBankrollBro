@@ -11,85 +11,36 @@ import {
   Line,
   Tooltip,
 } from 'recharts';
-import { supabase } from '@/lib/supabase';
-import { Session } from '@/components/SessionCard';
-import { useEffect, useState } from 'react';
+import useSessionsStore from '@/state'; // Import Zustand store
+import { useEffect } from 'react';
 import { StateCard } from '@/components/StatCard';
 
 export default function DashboardScreen() {
   const tintColor = useThemeColor('tint');
   const screenWidth = Dimensions.get('window').width;
 
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  // const chartData = [
-  //   { name: 'Jan', value: 1200 },
-  //   { name: 'Feb', value: 1900 },
-  //   { name: 'Mar', value: 1500 },
-  //   { name: 'Apr', value: 2800 },
-  //   { name: 'May', value: 2100 },
-  //   { name: 'Jun', value: 3000 },
-  // ];
-
-  // const nativeChartData = {
-  //   labels: chartData.map(d => d.name),
-  //   datasets: [
-  //     {
-  //       data: chartData.map(d => d.value),
-  //     },
-  //   ],
-  // };
-
-  const fetchSessions = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('sessions')
-          .select('*')
-          .order('date', { ascending: false });
+  // Use Zustand store
+  const { sessions, fetchSessions } = useSessionsStore();
   
-        if (error) throw error;
+  const chartData = sessions.map(session => ({
+    name: session.date,
+    value: session.cashOut - session.buyIn,
+  }));
   
-        if (data) {
-          const formattedSessions: Session[] = data.map(session => ({
-            id: session.id,
-            date: session.date,
-            location: session.location,
-            buyIn: session.buy_in,
-            cashOut: session.cash_out,
-            duration: session.duration,
-            gameType: session.game_type,
-          }));
-          setSessions(formattedSessions);
-        }
-      } catch (error) {
-        console.error('Error fetching sessions:', error);
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
-      }
-    };
+  const nativeChartData = {
+    labels: chartData.map(d => d.name),
+    datasets: [
+      {
+        data: chartData.map(d => d.value),
+        color: (opacity = 1) => tintColor, // optional
+        strokeWidth: 2, // optional
+      },
+    ],
+  };
 
-    const chartData = sessions.map(session => ({
-      name: session.date,
-      value: session.cashOut - session.buyIn,
-    }));
-    
-    const nativeChartData = {
-      labels: chartData.map(d => d.name),
-      datasets: [
-        {
-          data: chartData.map(d => d.value),
-          color: (opacity = 1) => tintColor, // optional
-          strokeWidth: 2, // optional
-        },
-      ],
-    };
-
-    useEffect(() => {
-      fetchSessions();
-    }, []);
+  useEffect(() => {
+    fetchSessions(); // Fetch sessions when the component mounts
+  }, [fetchSessions]);
 
   return (
     <ScrollView style={styles.container}>
@@ -142,7 +93,7 @@ export default function DashboardScreen() {
       </View>
 
       <View style={styles.statsContainer}>
-        <StateCard label="Total Sessions" value="32" />
+        <StateCard label="Total Sessions" value={sessions.length.toString()} />
         <StateCard label="Total Profit" value="$3,000" />
         <StateCard label="Avg. Profit" value="$94" />
       </View>
@@ -160,21 +111,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: 18, // Increased size for better visibility
-    fontWeight: '500', // Lighter weight for a modern look
-    color: '#333', // Darker color for contrast
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#333',
     marginBottom: 8,
-    letterSpacing: 0.5, // Added letter spacing
+    letterSpacing: 0.5,
   },
   balance: {
-    fontSize: 40, // Increased size for emphasis
+    fontSize: 40,
     fontWeight: '700',
     marginBottom: 4,
-    color: '#2c3e50', // Darker color for a modern touch
+    color: '#2c3e50',
   },
   subtitle: {
     fontSize: 14,
-    color: '#7f8c8d', // Softer color for a modern feel
+    color: '#7f8c8d',
   },
   chartContainer: {
     backgroundColor: '#fff',

@@ -8,8 +8,8 @@ type StatCardProps = {
 export function StateCard({label, value}: StatCardProps ) {
     return (
         <View style={styles.statCard}>
-            <Text style={styles.statValue}>32</Text>
-            <Text style={styles.statLabel}>Total Sessions</Text>
+            <Text style={styles.statValue}>{value}</Text>
+            <Text style={styles.statLabel}>{label}</Text>
         </View>
     )
 }

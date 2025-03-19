@@ -11,17 +11,18 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { supabase } from '../lib/supabase';
 import { useThemeColor } from '../hooks/useThemeColor';
 import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import useSessionsStore from '@/state'; // Import Zustand store
+import { Session } from './SessionCard';
 
 type AddSessionSheetProps = {
   isVisible: boolean;
   onClose: () => void;
-  onSessionAdded: () => void;
+  //onSessionAdded: (Session: Session) => Promise<void>;
 };
 
-export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessionSheetProps) {
+export function AddSessionSheet({ isVisible, onClose, /*onSessionAdded*/ }: AddSessionSheetProps) {
   const tintColor = useThemeColor('tint');
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [loading, setLoading] = useState(false);
@@ -74,24 +75,20 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
 
     setLoading(true);
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !userData.user) {
-        throw new Error('User not authenticated');
-      }
-
-      const { error } = await supabase.from('sessions').insert({
-        user_id: userData.user.id,
+      // Use Zustand's addSession function
+      const newSession = {
+        id: '0',
         location: formData.location,
-        game_type: formData.gameType,
-        buy_in: parseInt(formData.buyIn),
-        cash_out: parseInt(formData.cashOut),
+        gameType: formData.gameType,
+        buyIn: parseInt(formData.buyIn),
+        cashOut: parseInt(formData.cashOut),
         duration: formData.duration,
         date: formData.date,
-        notes: formData.notes || '',
-      });
+        notes: formData.notes,
+      };
 
-      if (error) throw error;
+      // Call the addSession function from Zustand store
+      await useSessionsStore.getState().addSession(newSession);
 
       // Reset form and close sheet
       setFormData({
@@ -104,7 +101,7 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
         notes: '',
       });
       
-      onSessionAdded();
+      //onSessionAdded();
       onClose();
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to add session');
@@ -127,7 +124,6 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
   const onDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || new Date(formData.date);
     
-    // On Android, the picker is dismissed automatically
     setShowDatePicker(Platform.OS === 'ios');
     
     if (selectedDate) {
@@ -166,7 +162,7 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
               style={styles.input}
               value={formData.date}
               placeholder="YYYY-MM-DD"
-              editable={false} // Make the TextInput non-editable
+              editable={false}
             />
             <Ionicons name="calendar-outline" size={20} color="#666" style={styles.calendarIcon} />
           </TouchableOpacity>
@@ -185,7 +181,7 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
                 value={new Date(formData.date || Date.now())}
                 mode="date"
                 display="spinner"
-                maximumDate={ new Date()}
+                maximumDate={new Date()}
                 onChange={onDateChange}
                 style={styles.iosPicker}
               />
@@ -278,11 +274,11 @@ export function AddSessionSheet({ isVisible, onClose, onSessionAdded }: AddSessi
           onPress={handleSubmit}
           disabled={!isFormValid() || loading}
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitButtonText}>Save Session</Text>
-          )}
+ {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.submitButtonText}>Save Session</Text>
+            )}
         </TouchableOpacity>
       </BottomSheetScrollView>
     </BottomSheet>
@@ -386,6 +382,6 @@ const styles = StyleSheet.create({
   iosPicker: {
     backgroundColor: '#fff',
     width: '100%',
-    height: 200,  // Set a fixed height for the picker
+    height: 200,
   },
 });

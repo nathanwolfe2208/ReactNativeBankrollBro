@@ -10,6 +10,7 @@ export type Session = {
   cashOut: number;
   duration: string;
   gameType: string;
+  notes?: string;
 };
 
 type SessionCardProps = {

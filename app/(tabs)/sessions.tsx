@@ -1,106 +1,72 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { SessionCard, Session } from '../../components/SessionCard';
 import { useRouter, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { AddSessionSheet } from '../../components/AddSessionSheet';
-import { supabase } from '../../lib/supabase';
+import { AddSessionSheet } from '@/components/AddSessionSheet';
+import { FilterSheet } from '@/components/FilterSheet';
+import useSessionsStore from '@/state'; // Import Zustand store
 import { useThemeColor } from '../../hooks/useThemeColor';
-import { Filters, FilterSheet } from '@/components/FilterSheet';
 
 export default function SessionsScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const tintColor = useThemeColor('tint');
-  const [sessions, setSessions] = useState<Session[]>([]);
+
+  // Use Zustand store
+  const { sessions, fetchSessions, addSession } = useSessionsStore();
+  
   const [loading, setLoading] = useState(true);
   const [isAddSessionVisible, setIsAddSessionVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isFilterSheetVisible, setIsFilterSheetVisible] = useState(false);
 
-  const fetchSessions = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('sessions')
-        .select('*')
-        .order('date', { ascending: false });
-
-      if (error) throw error;
-
-      if (data) {
-        const formattedSessions: Session[] = data.map(session => ({
-          id: session.id,
-          date: session.date,
-          location: session.location,
-          buyIn: session.buy_in,
-          cashOut: session.cash_out,
-          duration: session.duration,
-          gameType: session.game_type,
-        }));
-        setSessions(formattedSessions);
-      }
-    } catch (error) {
-      console.error('Error fetching sessions:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+  const fetchAndSetSessions = async () => {
+    setLoading(true);
+    await fetchSessions(); // Fetch sessions from Zustand store
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchSessions();
+    fetchAndSetSessions();
   }, []);
 
   const handleSessionPress = (session: Session) => {
-    // Navigate to session details (to be implemented)
     console.log('Session pressed:', session);
   };
+
   const handleRefresh = () => {
     setRefreshing(true);
-    fetchSessions();
+    fetchAndSetSessions();
+    setRefreshing(false);
   };
 
   const handleAddSession = () => {
     setIsAddSessionVisible(true);
   };
 
-  const handleFilterSession = () => {
-    setIsFilterSheetVisible(true);
-  };
-
   const handleCloseAddSession = () => {
     setIsAddSessionVisible(false);
+  };
+
+  const handleSessionAdded = async (newSession: Session) => {
+    await addSession(newSession); // Pass the new session to the store
+    fetchAndSetSessions(); // Optionally refresh the sessions
   };
 
   const handleCloseFilterSession = () => {
     setIsFilterSheetVisible(false);
   };
 
-  const handleSessionAdded = () => {
-    fetchSessions();
+  const filterSessions = (filters: any) => {
+    // Implement filtering logic here
+    // You can access sessions from Zustand store
+    console.log('Filtering sessions with:', filters);
   };
-
-  function filterSessions(filters: Filters) {
-    // TODO: IMPLEMENT THE REST OF THE FILTERING
-    if (filters.dateRange !== null && filters.dateRange instanceof Date) {
-      
-      const filteredSessions = sessions.filter(session => {
-        const sessionDate = new Date(session.date);
-        return sessionDate > filters.dateRange!; 
-      });
-  
-      console.log('Filtering by date range:', filters.dateRange);
-      console.log('Filtered sessions:', filteredSessions);
-      
-      setSessions(filteredSessions);
-    } else {
-      fetchSessions();
-    }
-  }
 
   return (
     <View style={styles.container}>
-      {loading && !refreshing ? (
+      {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={tintColor} />
         </View>
@@ -131,7 +97,7 @@ export default function SessionsScreen() {
 
       <TouchableOpacity
         style={[styles.configButton, { backgroundColor: '#666666' }]}
-        onPress={handleFilterSession}
+        onPress={handleCloseFilterSession}
       >
         <Ionicons name="options" size={24} color="#fff" />
       </TouchableOpacity>
@@ -146,7 +112,7 @@ export default function SessionsScreen() {
       <AddSessionSheet
         isVisible={isAddSessionVisible}
         onClose={handleCloseAddSession}
-        onSessionAdded={handleSessionAdded}
+        //onSessionAdded={handleSessionAdded} // Pass the handler to AddSessionSheet
       />
 
       <FilterSheet
@@ -155,7 +121,7 @@ export default function SessionsScreen() {
         onFilterApplied={filterSessions}
       />
     </View>
-  );
+ );
 }
 
 const styles = StyleSheet.create({
@@ -170,7 +136,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingVertical: 16,
-    paddingBottom: 80, // Extra padding for FAB
+    paddingBottom: 80,
     minHeight: '100%',
   },
   addButton: {
