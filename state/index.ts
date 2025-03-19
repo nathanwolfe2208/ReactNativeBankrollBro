@@ -5,8 +5,16 @@ import { create } from 'zustand';
 interface SessionsStore {
   sessions: Session[];
   fetchSessions: () => Promise<void>;
-  addSession: (session: Session) => Promise<void>; // Specify the return type as Promise
+  addSession: (session: Session) => Promise<void>;
+  Locs: Location[];
+  fetchLocations: () => Promise<void>;
+  addLocation: (location: Location) => Promise<void>;
 }
+
+type Location = {
+  id: string;
+  name: string;
+};
 
 const useSessionsStore = create<SessionsStore>((set) => ({
   sessions: [],
@@ -65,6 +73,53 @@ const useSessionsStore = create<SessionsStore>((set) => ({
       console.error(
         'Error adding session:',
         error.message || 'Failed to add session',
+      );
+    }
+  },
+  Locs: [],
+  fetchLocations: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('*')
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+
+      if (data) {
+        const formattedLocs: Location[] = data.map((location) => ({
+          id: location.id,
+          name: location.name,
+        }));
+        set({ Locs: formattedLocs });
+      }
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+    }
+  },
+  addLocation: async (loc: Location) => {
+    try {
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+
+      if (userError || !userData.user) {
+        throw new Error('User  not authenticated');
+      }
+
+      const { error } = await supabase.from('locations').insert({
+        user_id: userData.user.id,
+        name: loc.name,
+      });
+
+      if (error) throw error;
+
+      set((state) => ({
+        Locs: [...state.Locs, loc],
+      }));
+    } catch (error: any) {
+      console.error(
+        'Error adding location:',
+        error.message || 'Failed to add location',
       );
     }
   },
