@@ -116,11 +116,11 @@ export function LocationDropdown({
         visible={showAddLocationModal}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setShowAddLocationModal(false)}
+        onRequestClose={() => {setShowAddLocationModal(false)}}
       >
         <TouchableOpacity
           style={styles.modalOverlay}
-          onPress={() => setShowAddLocationModal(false)}
+          onPress={() => {}}
           activeOpacity={1}
         >
           <View style={styles.addLocationModal}>

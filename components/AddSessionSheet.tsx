@@ -9,7 +9,6 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
-  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '../hooks/useThemeColor';
@@ -17,8 +16,9 @@ import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
-import useSessionsStore from '@/state'; // Import Zustand store
-import { LocationDropdown } from './locationDropDown'; // Import our new component
+import useSessionsStore, { gameType } from '@/state'; // Import Zustand store
+import { LocationDropdown } from './locationDropDown'; 
+import { StakeDropdown } from './stakeDropDown'
 
 type AddSessionSheetProps = {
   isVisible: boolean;
@@ -32,7 +32,7 @@ export function AddSessionSheet({
   const tintColor = useThemeColor('tint');
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [loading, setLoading] = useState(false);
-  const { Locs, addLocation } = useSessionsStore(); // Get locations from Zustand store
+  const { Locs, gTypes, addLocation, addGameType } = useSessionsStore(); // Get data from Zustand store
 
   const [formData, setFormData] = useState({
     location: '',
@@ -122,6 +122,14 @@ export function AddSessionSheet({
     }
     
     addLocation({id: '0', name: locationName});
+  };
+
+  const handleAddNewStake = (stake: gameType) => {
+    if (!stake.sb || !stake.bb) {
+      return;
+    }
+    
+    addGameType({id: '0', sb: stake.sb, bb: stake.bb, str: stake.str});
   };
 
   const onDateChange = (event: any, selectedDate?: Date) => {
@@ -222,7 +230,7 @@ export function AddSessionSheet({
             )}
           </View>
 
-          {/* Use our new LocationDropdown component */}
+          {/* Location dropdown component */}
           <LocationDropdown
             locations={Locs}
             selectedLocation={formData.location}
@@ -231,15 +239,14 @@ export function AddSessionSheet({
             tintColor={tintColor}
           />
 
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Game Type</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.gameType}
-              onChangeText={(value) => handleChange('gameType', value)}
-              placeholder="e.g., NL Hold'em 2/5"
-            />
-          </View>
+          {/* Game stakes dropdown component */}
+          <StakeDropdown
+            stakes={gTypes || []}
+            selectedStake={formData.gameType}
+            onSelectStake={(gameType) => handleChange('gameType', gameType)}
+            onAddStake={handleAddNewStake}
+            tintColor={tintColor}
+          />
 
           <View style={styles.row}>
             <View style={[styles.formGroup, styles.halfWidth]}>
