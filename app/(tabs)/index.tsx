@@ -101,12 +101,19 @@ export default function DashboardScreen() {
       </View>
 
       <View style={styles.statsContainer}>
-        <StateCard label="Total Sessions" value={sessions.length.toString()} />
-        <StateCard label="Total Profit" value={totalBR.toString()} />
-        <StateCard
-          label="Avg. Profit"
-          value={avgProfit.toFixed(1).toString()}
-        />
+        <View style={styles.statsRow}>
+          <StateCard label="Total Sessions" value={sessions.length.toString()} />
+          <StateCard label="Total Profit" value={totalBR.toString()} />
+        </View>
+        <View style={styles.statsRow}>
+          <StateCard
+            label="Avg. Profit"
+            value={avgProfit.toFixed(1).toString()}
+          />
+          <StateCard 
+            label="Win Rate" 
+            value="50%" />
+        </View>
       </View>
     </ScrollView>
   );
@@ -153,8 +160,13 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    //justifyContent: 'space-between',
     padding: 16,
   },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  }
 });
