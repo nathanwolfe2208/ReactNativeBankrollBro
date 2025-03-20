@@ -11,7 +11,7 @@ interface SessionsStore {
   addLocation: (location: Location) => Promise<void>;
 }
 
-type Location = {
+export type Location = {
   id: string;
   name: string;
 };
@@ -81,8 +81,7 @@ const useSessionsStore = create<SessionsStore>((set) => ({
     try {
       const { data, error } = await supabase
         .from('locations')
-        .select('*')
-        .order('date', { ascending: false });
+        .select('*');
 
       if (error) throw error;
 
