@@ -16,22 +16,23 @@ import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
-import useSessionsStore from '@/state'; // Import Zustand store
-import { Session } from './SessionCard';
+import useSessionsStore, { gameType } from '@/state'; // Import Zustand store
+import { LocationDropdown } from './locationDropDown'; 
+import { StakeDropdown } from './stakeDropDown'
 
 type AddSessionSheetProps = {
   isVisible: boolean;
   onClose: () => void;
-  //onSessionAdded: (Session: Session) => Promise<void>;
 };
 
 export function AddSessionSheet({
   isVisible,
-  onClose /*onSessionAdded*/,
+  onClose,
 }: AddSessionSheetProps) {
   const tintColor = useThemeColor('tint');
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [loading, setLoading] = useState(false);
+  const { Locs, gTypes, addLocation, addGameType } = useSessionsStore(); // Get data from Zustand store
 
   const [formData, setFormData] = useState({
     location: '',
@@ -107,12 +108,38 @@ export function AddSessionSheet({
         notes: '',
       });
 
-      //onSessionAdded();
       onClose();
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to add session');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddNewLocation = (locationName: string) => {
+    if (locationName.trim() === '') {
+      return;
+    }
+    
+    addLocation({id: '0', name: locationName});
+  };
+
+  const handleAddNewStake = (stake: gameType) => {
+    if (!stake.sb || !stake.bb) {
+      return;
+    }
+    
+    addGameType({id: '0', sb: stake.sb, bb: stake.bb, str: stake.str});
+  };
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || new Date(formData.date);
+
+    setShowDatePicker(Platform.OS === 'ios');
+
+    if (selectedDate) {
+      const isoDate = currentDate.toISOString().split('T')[0];
+      handleChange('date', isoDate);
     }
   };
 
@@ -127,176 +154,165 @@ export function AddSessionSheet({
     [],
   );
 
-  const onDateChange = (event: any, selectedDate?: Date) => {
-    const currentDate = selectedDate || new Date(formData.date);
-
-    setShowDatePicker(Platform.OS === 'ios');
-
-    if (selectedDate) {
-      const isoDate = currentDate.toISOString().split('T')[0];
-      handleChange('date', isoDate);
-    }
-  };
-
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      index={isVisible ? 0 : -1}
-      snapPoints={snapPoints}
-      enablePanDownToClose
-      onClose={onClose}
-      handleIndicatorStyle={{ backgroundColor: '#999' }}
-      backgroundStyle={{ backgroundColor: '#fff' }}
-      backdropComponent={renderBackdrop}
-      enableContentPanningGesture={Platform.OS !== 'web'}
-    >
-      <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Add New Session</Text>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Ionicons name="close" size={24} color="#666" />
-          </TouchableOpacity>
-        </View>
+    <>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={isVisible ? 0 : -1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        onClose={onClose}
+        handleIndicatorStyle={{ backgroundColor: '#999' }}
+        backgroundStyle={{ backgroundColor: '#fff' }}
+        backdropComponent={renderBackdrop}
+        enableContentPanningGesture={Platform.OS !== 'web'}
+      >
+        <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Add New Session</Text>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <Ionicons name="close" size={24} color="#666" />
+            </TouchableOpacity>
+          </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Date</Text>
-          <TouchableOpacity
-            onPress={() => setShowDatePicker(true)}
-            style={styles.datePickerButton}
-          >
-            <TextInput
-              style={styles.input}
-              value={formData.date}
-              placeholder="YYYY-MM-DD"
-              editable={false}
-            />
-            <Ionicons
-              name="calendar-outline"
-              size={20}
-              color="#666"
-              style={styles.calendarIcon}
-            />
-          </TouchableOpacity>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Date</Text>
+            <TouchableOpacity
+              onPress={() => setShowDatePicker(true)}
+              style={styles.datePickerButton}
+            >
+              <TextInput
+                style={styles.input}
+                value={formData.date}
+                placeholder="YYYY-MM-DD"
+                editable={false}
+              />
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color="#666"
+                style={styles.calendarIcon}
+              />
+            </TouchableOpacity>
 
-          {Platform.OS === 'ios' && showDatePicker && (
-            <View style={styles.iosPickerContainer}>
-              <View style={styles.iosPickerHeader}>
-                <TouchableOpacity
-                  onPress={() => setShowDatePicker(false)}
-                  style={styles.iosDoneButton}
-                >
-                  <Text
-                    style={[styles.iosDoneButtonText, { color: tintColor }]}
+            {Platform.OS === 'ios' && showDatePicker && (
+              <View style={styles.iosPickerContainer}>
+                <View style={styles.iosPickerHeader}>
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker(false)}
+                    style={styles.iosDoneButton}
                   >
-                    Done
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      style={[styles.iosDoneButtonText, { color: tintColor }]}
+                    >
+                      Done
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <DateTimePicker
+                  value={new Date(formData.date || Date.now())}
+                  mode="date"
+                  display="spinner"
+                  maximumDate={new Date()}
+                  onChange={onDateChange}
+                  style={styles.iosPicker}
+                />
               </View>
+            )}
+
+            {Platform.OS === 'android' && showDatePicker && (
               <DateTimePicker
                 value={new Date(formData.date || Date.now())}
                 mode="date"
-                display="spinner"
-                maximumDate={new Date()}
+                display="default"
                 onChange={onDateChange}
-                style={styles.iosPicker}
+              />
+            )}
+          </View>
+
+          {/* Location dropdown component */}
+          <LocationDropdown
+            locations={Locs}
+            selectedLocation={formData.location}
+            onSelectLocation={(location) => handleChange('location', location)}
+            onAddLocation={handleAddNewLocation}
+            tintColor={tintColor}
+          />
+
+          {/* Game stakes dropdown component */}
+          <StakeDropdown
+            stakes={gTypes || []}
+            selectedStake={formData.gameType}
+            onSelectStake={(gameType) => handleChange('gameType', gameType)}
+            onAddStake={handleAddNewStake}
+            tintColor={tintColor}
+          />
+
+          <View style={styles.row}>
+            <View style={[styles.formGroup, styles.halfWidth]}>
+              <Text style={styles.label}>Buy-in ($)</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.buyIn}
+                onChangeText={(value) => handleChange('buyIn', value)}
+                placeholder="1000"
+                keyboardType="numeric"
               />
             </View>
-          )}
 
-          {Platform.OS === 'android' && showDatePicker && (
-            <DateTimePicker
-              value={new Date(formData.date || Date.now())}
-              mode="date"
-              display="default"
-              onChange={onDateChange}
-            />
-          )}
-        </View>
+            <View style={[styles.formGroup, styles.halfWidth]}>
+              <Text style={styles.label}>Cash-out ($)</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.cashOut}
+                onChangeText={(value) => handleChange('cashOut', value)}
+                placeholder="1450"
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Location</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.location}
-            onChangeText={(value) => handleChange('location', value)}
-            placeholder="e.g., Bellagio"
-          />
-        </View>
-
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Game Type</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.gameType}
-            onChangeText={(value) => handleChange('gameType', value)}
-            placeholder="e.g., NL Hold'em 2/5"
-          />
-        </View>
-
-        <View style={styles.row}>
-          <View style={[styles.formGroup, styles.halfWidth]}>
-            <Text style={styles.label}>Buy-in ($)</Text>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Duration</Text>
             <TextInput
               style={styles.input}
-              value={formData.buyIn}
-              onChangeText={(value) => handleChange('buyIn', value)}
-              placeholder="1000"
-              keyboardType="numeric"
+              value={formData.duration}
+              onChangeText={(value) => handleChange('duration', value)}
+              placeholder="e.g., 4h 30m"
             />
           </View>
 
-          <View style={[styles.formGroup, styles.halfWidth]}>
-            <Text style={styles.label}>Cash-out ($)</Text>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Notes (Optional)</Text>
             <TextInput
-              style={styles.input}
-              value={formData.cashOut}
-              onChangeText={(value) => handleChange('cashOut', value)}
-              placeholder="1450"
-              keyboardType="numeric"
+              style={[styles.input, styles.textArea]}
+              value={formData.notes}
+              onChangeText={(value) => handleChange('notes', value)}
+              placeholder="Any notes about this session..."
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
             />
           </View>
-        </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Duration</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.duration}
-            onChangeText={(value) => handleChange('duration', value)}
-            placeholder="e.g., 4h 30m"
-          />
-        </View>
-
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Notes (Optional)</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={formData.notes}
-            onChangeText={(value) => handleChange('notes', value)}
-            placeholder="Any notes about this session..."
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.submitButton,
-            { backgroundColor: tintColor },
-            !isFormValid() && styles.disabledButton,
-          ]}
-          onPress={handleSubmit}
-          disabled={!isFormValid() || loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitButtonText}>Save Session</Text>
-          )}
-        </TouchableOpacity>
-      </BottomSheetScrollView>
-    </BottomSheet>
+          <TouchableOpacity
+            style={[
+              styles.submitButton,
+              { backgroundColor: tintColor },
+              !isFormValid() && styles.disabledButton,
+            ]}
+            onPress={handleSubmit}
+            disabled={!isFormValid() || loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.submitButtonText}>Save Session</Text>
+            )}
+          </TouchableOpacity>
+        </BottomSheetScrollView>
+      </BottomSheet>
+    </>
   );
 }
 
