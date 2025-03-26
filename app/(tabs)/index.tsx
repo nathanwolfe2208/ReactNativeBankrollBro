@@ -43,6 +43,23 @@ export default function DashboardScreen() {
   }, 0);
   const avgProfit = totalBR / sessions.length;
 
+  const profSesCount = sessions.reduce((acc, session) => {
+    return acc + (session.cashOut > session.buyIn ? 1 : 0);
+  }, 0);
+
+  const profitabilityRate = (profSesCount / sessions.length) * 100;
+
+  const totalHoursPlayed = sessions.reduce((totalHours, session) => {
+    // Convert duration string "hh:mm:ss" to hours
+    const [hours, minutes, seconds] = (session.duration || "0:0:0").split(':').map(Number);
+    const sessionHours = hours + minutes / 60 + seconds / 3600;
+    
+    // Add to total hours
+    return totalHours + sessionHours;
+  }, 0);
+
+  const profitPerHour = totalBR / totalHoursPlayed;
+
   useEffect(() => {
     fetchSessions();
   }, [fetchSessions]);
@@ -111,8 +128,12 @@ export default function DashboardScreen() {
             value={avgProfit.toFixed(1).toString()}
           />
           <StateCard 
-            label="Win Rate" 
-            value="50%" />
+            label="Profitability Rate" 
+            value={`${profitabilityRate.toFixed(1).toString()}` + '%'}/>
+        </View>
+        <View style={styles.statsRow}>
+          <StateCard label="Profit/Hour" value={profitPerHour.toFixed(1).toString()} />
+          <StateCard label="Total Hours Played" value={totalHoursPlayed.toFixed(1).toString()} />
         </View>
       </View>
     </ScrollView>
