@@ -51,9 +51,11 @@ export default function DashboardScreen() {
 
   const totalHoursPlayed = sessions.reduce((totalHours, session) => {
     // Convert duration string "hh:mm:ss" to hours
-    const [hours, minutes, seconds] = (session.duration || "0:0:0").split(':').map(Number);
+    const [hours, minutes, seconds] = (session.duration || '0:0:0')
+      .split(':')
+      .map(Number);
     const sessionHours = hours + minutes / 60 + seconds / 3600;
-    
+
     // Add to total hours
     return totalHours + sessionHours;
   }, 0);
@@ -119,7 +121,10 @@ export default function DashboardScreen() {
 
       <View style={styles.statsContainer}>
         <View style={styles.statsRow}>
-          <StateCard label="Total Sessions" value={sessions.length.toString()} />
+          <StateCard
+            label="Total Sessions"
+            value={sessions.length.toString()}
+          />
           <StateCard label="Total Profit" value={totalBR.toString()} />
         </View>
         <View style={styles.statsRow}>
@@ -127,13 +132,20 @@ export default function DashboardScreen() {
             label="Avg. Profit"
             value={avgProfit.toFixed(1).toString()}
           />
-          <StateCard 
-            label="Profitability Rate" 
-            value={`${profitabilityRate.toFixed(1).toString()}` + '%'}/>
+          <StateCard
+            label="Profitability Rate"
+            value={`${profitabilityRate.toFixed(1).toString()}` + '%'}
+          />
         </View>
         <View style={styles.statsRow}>
-          <StateCard label="Profit/Hour" value={profitPerHour.toFixed(1).toString()} />
-          <StateCard label="Total Hours Played" value={totalHoursPlayed.toFixed(1).toString()} />
+          <StateCard
+            label="Profit/Hour"
+            value={profitPerHour.toFixed(1).toString()}
+          />
+          <StateCard
+            label="Total Hours Played"
+            value={totalHoursPlayed.toFixed(1).toString()}
+          />
         </View>
       </View>
     </ScrollView>
@@ -189,5 +201,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
-  }
+  },
 });

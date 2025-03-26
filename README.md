@@ -16,26 +16,29 @@ This is an Expo application that integrates with Supabase for backend services, 
    ```
    git clone https://github.com/yourusername/your-repo-name.git
    cd your-repo-name
-   
+
    ```
+
 2. **Install Dependencies**
 
    ```
    npm install
-   
+
    ```
+
 3. **Set Up Environment Variables**
 
    ```
    EXPO_PUBLIC_SUPABASE_URL=
    EXPO_PUBLIC_SUPABASE_ANON_KEY=
-   
+
    ```
+
 4. **Start the Development Server**
 
    ```
    npx expo start
-   
+
    ```
 
 ### Testing the App
@@ -55,10 +58,11 @@ This is an Expo application that integrates with Supabase for backend services, 
 - Ensure that you have dotenv installed
 - dotenv is a package to manage environment variables.
 - Access these variables in your code using:
+
   ```
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-  
+
   ```
 
 ## Contributing

@@ -85,17 +85,17 @@ export default function SettingsScreen() {
           icon="cash-outline"
           label="Default Buy-in"
           value="$1,000"
-          onPress={() => {}}
+          onPress={() => router.push('/(settings)/default-buyin')}
         />
         <SettingItem
           icon="game-controller-outline"
           label="Game Types"
-          onPress={() => {}}
+          onPress={() => router.push('/(settings)/game-types')}
         />
         <SettingItem
           icon="location-outline"
           label="Locations"
-          onPress={() => {}}
+          onPress={() => router.push('/(settings)/locations')}
         />
       </View>
 

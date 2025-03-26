@@ -35,24 +35,26 @@ export function StakeDropdown({
     str: '',
   });
   const [loading, setLoading] = useState(false);
-  const {gTypes, addGameType, fetchGameTypes} = useSessionsStore();
+  const { gTypes, addGameType, fetchGameTypes } = useSessionsStore();
 
   const fetchandSetGameTypes = async () => {
-      setLoading(true);
-      await fetchGameTypes(); // Fetch sessions from Zustand store
-      setLoading(false);
-    };
-  
-    useEffect(() => {
-      fetchandSetGameTypes();
-    }, []);
+    setLoading(true);
+    await fetchGameTypes(); // Fetch sessions from Zustand store
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchandSetGameTypes();
+  }, []);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
   const formatStake = (stake: gameType): string => {
-    return stake.str ? `${stake.sb}/${stake.bb}/${stake.str}` : `${stake.sb}/${stake.bb}`;
+    return stake.str
+      ? `${stake.sb}/${stake.bb}/${stake.str}`
+      : `${stake.sb}/${stake.bb}`;
   };
 
   const selectStake = (stake: gameType) => {
@@ -65,17 +67,17 @@ export function StakeDropdown({
       Alert.alert('Error', 'Small blind and big blind are required');
       return;
     }
-    
+
     const stake: gameType = {
-        id: '0',
+      id: '0',
       sb: parseFloat(newStake.sb),
       bb: parseFloat(newStake.bb),
     };
-    
+
     if (newStake.str.trim() !== '') {
       stake.str = parseFloat(newStake.str);
     }
-    
+
     onAddStake(stake);
     onSelectStake(formatStake(stake));
     setNewStake({ sb: '', bb: '', str: '' });
@@ -95,18 +97,27 @@ export function StakeDropdown({
             <Ionicons name="add-circle" size={20} color={tintColor} />
           </TouchableOpacity>
         </View>
-        
+
         <TouchableOpacity
           style={styles.dropdown}
           onPress={toggleDropdown}
           activeOpacity={0.7}
         >
-          <Text style={[styles.dropdownText, !selectedStake && styles.placeholderText]}>
+          <Text
+            style={[
+              styles.dropdownText,
+              !selectedStake && styles.placeholderText,
+            ]}
+          >
             {selectedStake || 'Select stakes'}
           </Text>
-          <Ionicons name={isOpen ? "chevron-up" : "chevron-down"} size={20} color="#666" />
+          <Ionicons
+            name={isOpen ? 'chevron-up' : 'chevron-down'}
+            size={20}
+            color="#666"
+          />
         </TouchableOpacity>
-        
+
         {isOpen && (
           <View style={styles.dropdownList}>
             <ScrollView nestedScrollEnabled style={styles.dropdownScroll}>
@@ -144,44 +155,50 @@ export function StakeDropdown({
         >
           <View style={styles.addStakeModal}>
             <Text style={styles.addStakeTitle}>Add New Stakes</Text>
-            
+
             <View style={styles.stakeInputRow}>
               <View style={styles.stakeInputItem}>
                 <Text style={styles.stakeInputLabel}>Small Blind</Text>
                 <TextInput
                   style={styles.input}
                   value={newStake.sb}
-                  onChangeText={(text) => setNewStake(prev => ({ ...prev, sb: text }))}
+                  onChangeText={(text) =>
+                    setNewStake((prev) => ({ ...prev, sb: text }))
+                  }
                   placeholder="1"
                   keyboardType="numeric"
                 />
               </View>
-              
+
               <View style={styles.stakeInputItem}>
                 <Text style={styles.stakeInputLabel}>Big Blind</Text>
                 <TextInput
                   style={styles.input}
                   value={newStake.bb}
-                  onChangeText={(text) => setNewStake(prev => ({ ...prev, bb: text }))}
+                  onChangeText={(text) =>
+                    setNewStake((prev) => ({ ...prev, bb: text }))
+                  }
                   placeholder="2"
                   keyboardType="numeric"
                 />
               </View>
             </View>
-            
+
             <View style={styles.stakeInputRow}>
               <View style={styles.stakeInputItem}>
                 <Text style={styles.stakeInputLabel}>Straddle (Optional)</Text>
                 <TextInput
                   style={styles.input}
                   value={newStake.str}
-                  onChangeText={(text) => setNewStake(prev => ({ ...prev, str: text }))}
+                  onChangeText={(text) =>
+                    setNewStake((prev) => ({ ...prev, str: text }))
+                  }
                   placeholder="4"
                   keyboardType="numeric"
                 />
               </View>
             </View>
-            
+
             <View style={styles.addStakeButtonsContainer}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.cancelButton]}

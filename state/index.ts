@@ -24,7 +24,7 @@ export type gameType = {
   sb: number;
   bb: number;
   str?: number | null;
-}
+};
 
 const useSessionsStore = create<SessionsStore>((set) => ({
   sessions: [],
@@ -89,9 +89,7 @@ const useSessionsStore = create<SessionsStore>((set) => ({
   Locs: [],
   fetchLocations: async () => {
     try {
-      const { data, error } = await supabase
-        .from('locations')
-        .select('*');
+      const { data, error } = await supabase.from('locations').select('*');
 
       if (error) throw error;
 
@@ -132,16 +130,15 @@ const useSessionsStore = create<SessionsStore>((set) => ({
       );
     }
   },
-  gTypes: [ {id: '', sb: 1, bb: 2, str: 0},
-            {id: '', sb: 2, bb: 5, str: 0},
-            {id: '', sb: 5, bb: 10, str: 0},
-            {id: '', sb: 10, bb: 20, str: 0},
-          ],
+  gTypes: [
+    { id: '', sb: 1, bb: 2, str: 0 },
+    { id: '', sb: 2, bb: 5, str: 0 },
+    { id: '', sb: 5, bb: 10, str: 0 },
+    { id: '', sb: 10, bb: 20, str: 0 },
+  ],
   fetchGameTypes: async () => {
     try {
-      const { data, error } = await supabase
-        .from('game_types')
-        .select('*');
+      const { data, error } = await supabase.from('game_types').select('*');
 
       if (error) throw error;
 

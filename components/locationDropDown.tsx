@@ -12,7 +12,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import useSessionsStore, { Location } from '@/state';
 
-
 type LocationDropdownProps = {
   locations: Location[];
   selectedLocation: string;
@@ -32,7 +31,7 @@ export function LocationDropdown({
   const [showAddLocationModal, setShowAddLocationModal] = useState(false);
   const [newLocationText, setNewLocationText] = useState('');
   const [loading, setLoading] = useState(false);
-  const {Locs, fetchLocations, addLocation} = useSessionsStore();
+  const { Locs, fetchLocations, addLocation } = useSessionsStore();
 
   const fetchAndSetLocations = async () => {
     setLoading(true);
@@ -58,7 +57,7 @@ export function LocationDropdown({
       Alert.alert('Error', 'Location name cannot be empty');
       return;
     }
-    
+
     onAddLocation(newLocationText);
     onSelectLocation(newLocationText);
     setNewLocationText('');
@@ -78,18 +77,27 @@ export function LocationDropdown({
             <Ionicons name="add-circle" size={20} color={tintColor} />
           </TouchableOpacity>
         </View>
-        
+
         <TouchableOpacity
           style={styles.dropdown}
           onPress={toggleDropdown}
           activeOpacity={0.7}
         >
-          <Text style={[styles.dropdownText, !selectedLocation && styles.placeholderText]}>
+          <Text
+            style={[
+              styles.dropdownText,
+              !selectedLocation && styles.placeholderText,
+            ]}
+          >
             {selectedLocation || 'Select a location'}
           </Text>
-          <Ionicons name={isOpen ? "chevron-up" : "chevron-down"} size={20} color="#666" />
+          <Ionicons
+            name={isOpen ? 'chevron-up' : 'chevron-down'}
+            size={20}
+            color="#666"
+          />
         </TouchableOpacity>
-        
+
         {isOpen && (
           <View style={styles.dropdownList}>
             <ScrollView nestedScrollEnabled style={styles.dropdownScroll}>
@@ -116,7 +124,9 @@ export function LocationDropdown({
         visible={showAddLocationModal}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => {setShowAddLocationModal(false)}}
+        onRequestClose={() => {
+          setShowAddLocationModal(false);
+        }}
       >
         <TouchableOpacity
           style={styles.modalOverlay}

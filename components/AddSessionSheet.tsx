@@ -17,18 +17,15 @@ import BottomSheet, {
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
 import useSessionsStore, { gameType } from '@/state'; // Import Zustand store
-import { LocationDropdown } from './locationDropDown'; 
-import { StakeDropdown } from './stakeDropDown'
+import { LocationDropdown } from './locationDropDown';
+import { StakeDropdown } from './stakeDropDown';
 
 type AddSessionSheetProps = {
   isVisible: boolean;
   onClose: () => void;
 };
 
-export function AddSessionSheet({
-  isVisible,
-  onClose,
-}: AddSessionSheetProps) {
+export function AddSessionSheet({ isVisible, onClose }: AddSessionSheetProps) {
   const tintColor = useThemeColor('tint');
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [loading, setLoading] = useState(false);
@@ -120,16 +117,16 @@ export function AddSessionSheet({
     if (locationName.trim() === '') {
       return;
     }
-    
-    addLocation({id: '0', name: locationName});
+
+    addLocation({ id: '0', name: locationName });
   };
 
   const handleAddNewStake = (stake: gameType) => {
     if (!stake.sb || !stake.bb) {
       return;
     }
-    
-    addGameType({id: '0', sb: stake.sb, bb: stake.bb, str: stake.str});
+
+    addGameType({ id: '0', sb: stake.sb, bb: stake.bb, str: stake.str });
   };
 
   const onDateChange = (event: any, selectedDate?: Date) => {
