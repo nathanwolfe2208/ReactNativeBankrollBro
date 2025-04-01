@@ -32,6 +32,11 @@ export function FilterSheet({
   onClose,
   onFilterApplied,
 }: FilterSheetProps) {
+  const backgroundColor = useThemeColor('surface');
+  const textColor = useThemeColor('text');
+  const textSecondary = useThemeColor('textSecondary');
+  const inputBackground = useThemeColor('input');
+  const borderColor = useThemeColor('border');
   const tintColor = useThemeColor('tint');
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [loading, setLoading] = useState(false);
@@ -46,15 +51,11 @@ export function FilterSheet({
   const snapPoints = ['50%'];
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isVisible) {
-        bottomSheetRef.current?.expand();
-      } else {
-        bottomSheetRef.current?.close();
+    if (bottomSheetRef.current) {
+      if (!isVisible) {
+        bottomSheetRef.current.close();
       }
-    }, 0);
-
-    return () => clearTimeout(timer);
+    }
   }, [isVisible]);
 
   const getDateFromRange = (range: string) => {
@@ -95,6 +96,12 @@ export function FilterSheet({
     onClose();
   };
 
+  const handleOnChange = (index: number) => {
+    if (index === -1) {
+      onClose();
+    }
+  };
+
   const renderBackdrop = React.useCallback(
     (props: any) => (
       <BottomSheetBackdrop
@@ -113,41 +120,58 @@ export function FilterSheet({
       snapPoints={snapPoints}
       enablePanDownToClose
       onClose={onClose}
-      handleIndicatorStyle={{ backgroundColor: '#999' }}
-      backgroundStyle={{ backgroundColor: '#fff' }}
+      onChange={handleOnChange}
+      handleIndicatorStyle={{ backgroundColor: textSecondary }}
+      backgroundStyle={{ backgroundColor }}
       backdropComponent={renderBackdrop}
       enableContentPanningGesture={Platform.OS !== 'web'}
     >
       <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.header}>
-          <Text style={styles.title}>Filter Sessions</Text>
+          <Text style={[styles.title, { color: textColor }]}>Filter Sessions</Text>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Ionicons name="close" size={24} color="#666" />
+            <Ionicons name="close" size={24} color={textSecondary} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.formGroup}>
-          <Text style={styles.label}>Location</Text>
+          <Text style={[styles.label, { color: textSecondary }]}>Location</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: inputBackground,
+                borderColor,
+                color: textColor,
+              },
+            ]}
             value={filters.location}
             onChangeText={(value) => handleChange('location', value)}
             placeholder="e.g., Bellagio"
+            placeholderTextColor={textSecondary}
           />
         </View>
 
         <View style={styles.formGroup}>
-          <Text style={styles.label}>Game Type</Text>
+          <Text style={[styles.label, { color: textSecondary }]}>Game Type</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: inputBackground,
+                borderColor,
+                color: textColor,
+              },
+            ]}
             value={filters.gameType}
             onChangeText={(value) => handleChange('gameType', value)}
             placeholder="e.g., NL Hold'em 2/5"
+            placeholderTextColor={textSecondary}
           />
         </View>
 
         <View style={styles.formGroup}>
-          <Text style={styles.label}>Date Range</Text>
+          <Text style={[styles.label, { color: textSecondary }]}>Date Range</Text>
           <View style={styles.dateRangeContainer}>
             {['1 month', '3 months', '6 months', '1 year', 'All'].map(
               (range) => (
@@ -217,12 +241,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     marginBottom: 6,
-    color: '#666',
   },
   input: {
-    backgroundColor: '#f8f9fa',
     borderWidth: 1,
-    borderColor: '#e1e1e1',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -236,18 +257,15 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e1e1e1',
     marginBottom: 8,
     width: '48%',
     alignItems: 'center',
-    backgroundColor: '#fff',
   },
   selectedDateRangeButton: {
     backgroundColor: '#e1e1e1',
   },
   dateRangeButtonText: {
     fontSize: 14,
-    color: '#666',
   },
   selectedDateRangeButtonText: {
     fontWeight: '600',

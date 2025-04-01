@@ -27,6 +27,12 @@ type AddSessionSheetProps = {
 
 export function AddSessionSheet({ isVisible, onClose }: AddSessionSheetProps) {
   const tintColor = useThemeColor('tint');
+  const backgroundColor = useThemeColor('surface');
+  const textColor = useThemeColor('text');
+  const textSecondary = useThemeColor('textSecondary');
+  const inputBackground = useThemeColor('input');
+  const borderColor = useThemeColor('border');
+  const placeholderColor = useThemeColor('placeholder');
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [loading, setLoading] = useState(false);
   const { Locs, gTypes, addLocation, addGameType } = useSessionsStore(); // Get data from Zustand store
@@ -46,16 +52,18 @@ export function AddSessionSheet({ isVisible, onClose }: AddSessionSheetProps) {
   const snapPoints = ['75%'];
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isVisible) {
-        bottomSheetRef.current?.expand();
-      } else {
-        bottomSheetRef.current?.close();
+    if (bottomSheetRef.current) {
+      if (!isVisible) {
+        bottomSheetRef.current.close();
       }
-    }, 0);
-
-    return () => clearTimeout(timer);
+    }
   }, [isVisible]);
+
+  const handleOnChange = (index: number) => {
+    if (index === -1) {
+      onClose();
+    }
+  };
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -159,72 +167,20 @@ export function AddSessionSheet({ isVisible, onClose }: AddSessionSheetProps) {
         snapPoints={snapPoints}
         enablePanDownToClose
         onClose={onClose}
-        handleIndicatorStyle={{ backgroundColor: '#999' }}
-        backgroundStyle={{ backgroundColor: '#fff' }}
+        onChange={handleOnChange}
+        handleIndicatorStyle={{ backgroundColor: textSecondary }}
+        backgroundStyle={{ backgroundColor }}
         backdropComponent={renderBackdrop}
         enableContentPanningGesture={Platform.OS !== 'web'}
       >
         <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
           <View style={styles.header}>
-            <Text style={styles.title}>Add New Session</Text>
+            <Text style={[styles.title, { color: textColor }]}>
+              Add New Session
+            </Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color="#666" />
+              <Ionicons name="close" size={24} color={textSecondary} />
             </TouchableOpacity>
-          </View>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Date</Text>
-            <TouchableOpacity
-              onPress={() => setShowDatePicker(true)}
-              style={styles.datePickerButton}
-            >
-              <TextInput
-                style={styles.input}
-                value={formData.date}
-                placeholder="YYYY-MM-DD"
-                editable={false}
-              />
-              <Ionicons
-                name="calendar-outline"
-                size={20}
-                color="#666"
-                style={styles.calendarIcon}
-              />
-            </TouchableOpacity>
-
-            {Platform.OS === 'ios' && showDatePicker && (
-              <View style={styles.iosPickerContainer}>
-                <View style={styles.iosPickerHeader}>
-                  <TouchableOpacity
-                    onPress={() => setShowDatePicker(false)}
-                    style={styles.iosDoneButton}
-                  >
-                    <Text
-                      style={[styles.iosDoneButtonText, { color: tintColor }]}
-                    >
-                      Done
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-                <DateTimePicker
-                  value={new Date(formData.date || Date.now())}
-                  mode="date"
-                  display="spinner"
-                  maximumDate={new Date()}
-                  onChange={onDateChange}
-                  style={styles.iosPicker}
-                />
-              </View>
-            )}
-
-            {Platform.OS === 'android' && showDatePicker && (
-              <DateTimePicker
-                value={new Date(formData.date || Date.now())}
-                mode="date"
-                display="default"
-                onChange={onDateChange}
-              />
-            )}
           </View>
 
           {/* Location dropdown component */}
@@ -247,9 +203,19 @@ export function AddSessionSheet({ isVisible, onClose }: AddSessionSheetProps) {
 
           <View style={styles.row}>
             <View style={[styles.formGroup, styles.halfWidth]}>
-              <Text style={styles.label}>Buy-in ($)</Text>
+              <Text style={[styles.label, { color: textSecondary }]}>
+                Buy-in ($)
+              </Text>
               <TextInput
-                style={styles.input}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: inputBackground,
+                    borderColor,
+                    color: textColor,
+                  },
+                ]}
+                placeholderTextColor={placeholderColor}
                 value={formData.buyIn}
                 onChangeText={(value) => handleChange('buyIn', value)}
                 placeholder="1000"
@@ -258,9 +224,19 @@ export function AddSessionSheet({ isVisible, onClose }: AddSessionSheetProps) {
             </View>
 
             <View style={[styles.formGroup, styles.halfWidth]}>
-              <Text style={styles.label}>Cash-out ($)</Text>
+              <Text style={[styles.label, { color: textSecondary }]}>
+                Cash-out ($)
+              </Text>
               <TextInput
-                style={styles.input}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: inputBackground,
+                    borderColor,
+                    color: textColor,
+                  },
+                ]}
+                placeholderTextColor={placeholderColor}
                 value={formData.cashOut}
                 onChangeText={(value) => handleChange('cashOut', value)}
                 placeholder="1450"
@@ -270,9 +246,19 @@ export function AddSessionSheet({ isVisible, onClose }: AddSessionSheetProps) {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Duration</Text>
+            <Text style={[styles.label, { color: textSecondary }]}>
+              Duration
+            </Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: inputBackground,
+                  borderColor,
+                  color: textColor,
+                },
+              ]}
+              placeholderTextColor={placeholderColor}
               value={formData.duration}
               onChangeText={(value) => handleChange('duration', value)}
               placeholder="e.g., 4h 30m"
@@ -280,9 +266,20 @@ export function AddSessionSheet({ isVisible, onClose }: AddSessionSheetProps) {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Notes (Optional)</Text>
+            <Text style={[styles.label, { color: textSecondary }]}>
+              Notes (Optional)
+            </Text>
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[
+                styles.input,
+                styles.textArea,
+                {
+                  backgroundColor: inputBackground,
+                  borderColor,
+                  color: textColor,
+                },
+              ]}
+              placeholderTextColor={placeholderColor}
               value={formData.notes}
               onChangeText={(value) => handleChange('notes', value)}
               placeholder="Any notes about this session..."
@@ -339,12 +336,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     marginBottom: 6,
-    color: '#666',
   },
   input: {
-    backgroundColor: '#f8f9fa',
     borderWidth: 1,
-    borderColor: '#e1e1e1',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -372,44 +366,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-  },
-  datePickerButton: {
-    position: 'relative',
-    width: '100%',
-  },
-  calendarIcon: {
-    position: 'absolute',
-    right: 12,
-    top: 12,
-  },
-  iosPickerContainer: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: '#e1e1e1',
-    overflow: 'hidden',
-    width: '100%',
-  },
-  iosPickerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    padding: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e1e1e1',
-    backgroundColor: '#fff',
-    width: '100%',
-  },
-  iosDoneButton: {
-    padding: 4,
-  },
-  iosDoneButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  iosPicker: {
-    backgroundColor: '#fff',
-    width: '100%',
-    height: 200,
   },
 });

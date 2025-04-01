@@ -9,6 +9,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'expo-router';
+import { useThemeColor } from '@/hooks/useThemeColor';
+import { useThemeStore } from '@/state/theme';
 
 type SettingItemProps = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -18,16 +20,30 @@ type SettingItemProps = {
 };
 
 function SettingItem({ icon, label, value, onPress }: SettingItemProps) {
+  const backgroundColor = useThemeColor('surface');
+  const textColor = useThemeColor('text');
+  const textSecondary = useThemeColor('textSecondary');
+  const borderColor = useThemeColor('border');
+
   return (
-    <Pressable style={styles.settingItem} onPress={onPress}>
+    <Pressable 
+      style={[
+        styles.settingItem, 
+        { 
+          backgroundColor,
+          borderBottomColor: borderColor,
+        }
+      ]} 
+      onPress={onPress}
+    >
       <View style={styles.settingIcon}>
-        <Ionicons name={icon} size={24} color="#666" />
+        <Ionicons name={icon} size={24} color={textSecondary} />
       </View>
       <View style={styles.settingContent}>
-        <Text style={styles.settingLabel}>{label}</Text>
-        {value && <Text style={styles.settingValue}>{value}</Text>}
+        <Text style={[styles.settingLabel, { color: textColor }]}>{label}</Text>
+        {value && <Text style={[styles.settingValue, { color: textSecondary }]}>{value}</Text>}
       </View>
-      <Ionicons name="chevron-forward" size={20} color="#666" />
+      <Ionicons name="chevron-forward" size={20} color={textSecondary} />
     </Pressable>
   );
 }
@@ -77,10 +93,11 @@ export default function SettingsScreen() {
       Alert.alert('Error', error.message || 'Failed to log out');
     }
   };
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: useThemeColor('background') }]}>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Game Settings</Text>
+        <Text style={[styles.sectionTitle, { color: useThemeColor('text') }]}>Game Settings</Text>
         <SettingItem
           icon="cash-outline"
           label="Default Buy-in"
@@ -100,7 +117,7 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>App Settings</Text>
+        <Text style={[styles.sectionTitle, { color: useThemeColor('text') }]}>App Settings</Text>
         <SettingItem
           icon="notifications-outline"
           label="Notifications"
@@ -109,8 +126,8 @@ export default function SettingsScreen() {
         <SettingItem
           icon="color-palette-outline"
           label="Theme"
-          value="Light"
-          onPress={() => {}}
+          value={useThemeStore((state) => state.theme)}
+          onPress={() => router.push('/(settings)/theme')}
         />
         <SettingItem
           icon="cloud-upload-outline"
@@ -120,7 +137,7 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About</Text>
+        <Text style={[styles.sectionTitle, { color: useThemeColor('text') }]}>About</Text>
         <SettingItem
           icon="information-circle-outline"
           label="Version"
@@ -135,7 +152,7 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
+        <Text style={[styles.sectionTitle, { color: useThemeColor('text') }]}>Account</Text>
         <SettingItem
           icon="log-out-outline"
           label="Logout"
@@ -164,11 +181,9 @@ const styles = StyleSheet.create({
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e1e1e1',
   },
   settingIcon: {
     width: 40,
@@ -183,7 +198,6 @@ const styles = StyleSheet.create({
   },
   settingValue: {
     fontSize: 14,
-    color: '#666',
     marginTop: 2,
   },
 });

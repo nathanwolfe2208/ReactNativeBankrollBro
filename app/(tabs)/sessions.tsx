@@ -19,6 +19,9 @@ export default function SessionsScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const tintColor = useThemeColor('tint');
+  const backgroundColor = useThemeColor('background');
+  const textColor = useThemeColor('text');
+  const textSecondary = useThemeColor('textSecondary');
 
   // Use Zustand store
   const { sessions, fetchSessions, addSession } = useSessionsStore();
@@ -76,9 +79,9 @@ export default function SessionsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor }]}>
       {loading ? (
-        <View style={styles.loadingContainer}>
+        <View style={[styles.loadingContainer, { backgroundColor }]}>
           <ActivityIndicator size="large" color={tintColor} />
         </View>
       ) : (
@@ -92,10 +95,10 @@ export default function SessionsScreen() {
           refreshing={refreshing}
           onRefresh={handleRefresh}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="calendar-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>No sessions yet</Text>
-              <Text style={styles.emptySubtext}>
+            <View style={[styles.emptyContainer, { backgroundColor }]}>
+              <Ionicons name="calendar-outline" size={64} color={textSecondary} />
+              <Text style={[styles.emptyText, { color: textColor }]}>No sessions yet</Text>
+              <Text style={[styles.emptySubtext, { color: textSecondary }]}>
                 Add your first poker session to start tracking
               </Text>
             </View>
@@ -135,7 +138,6 @@ export default function SessionsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   loadingContainer: {
     flex: 1,
@@ -192,7 +194,6 @@ const styles = StyleSheet.create({
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#666',
     textAlign: 'center',
   },
 });

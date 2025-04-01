@@ -19,37 +19,71 @@ type SessionCardProps = {
 };
 
 export function SessionCard({ session, onPress }: SessionCardProps) {
-  const tintColor = useThemeColor('tint');
   const profit = session.cashOut - session.buyIn;
   const isProfit = profit >= 0;
 
+  const backgroundColor = useThemeColor('surface');
+  const textColor = useThemeColor('text');
+  const textSecondary = useThemeColor('textSecondary');
+  const dividerColor = useThemeColor('divider');
+  const shadowColor = useThemeColor('shadow');
+  const successColor = useThemeColor('success');
+  const errorColor = useThemeColor('error');
+
   return (
-    <Pressable style={styles.container} onPress={() => onPress(session)}>
+    <Pressable
+      style={[
+        styles.container,
+        {
+          backgroundColor,
+          shadowColor,
+        },
+      ]}
+      onPress={() => onPress(session)}
+    >
       <View style={styles.header}>
-        <Text style={styles.date}>{session.date}</Text>
-        <Text style={styles.location}>{session.location}</Text>
+        <Text style={[styles.date, { color: textColor }]}>{session.date}</Text>
+        <Text style={[styles.location, { color: textSecondary }]}>{session.location}</Text>
       </View>
+
       <View style={styles.details}>
         <View style={styles.gameInfo}>
-          <Text style={styles.gameType}>{session.gameType}</Text>
-          <Text style={styles.duration}>{session.duration}</Text>
+          <Text style={[styles.gameType, { color: textColor }]}>{session.gameType}</Text>
+          <Text style={[styles.duration, { color: textSecondary }]}>{session.duration}</Text>
         </View>
-        <View style={styles.profitContainer}>
+        <View
+          style={[
+            styles.profitContainer,
+            { backgroundColor: useThemeColor('surfaceSecondary') },
+          ]}
+        >
           <Text
-            style={[styles.profit, { color: isProfit ? '#34C759' : '#FF3B30' }]}
+            style={[
+              styles.profit,
+              { color: isProfit ? successColor : errorColor },
+            ]}
           >
             {isProfit ? '+' : '-'}${Math.abs(profit)}
           </Text>
         </View>
       </View>
-      <View style={styles.footer}>
+
+      <View style={[styles.footer, { borderTopColor: dividerColor }]}>
         <View style={styles.stat}>
-          <Text style={styles.statLabel}>Buy-in</Text>
-          <Text style={styles.statValue}>${session.buyIn}</Text>
+          <Text style={[styles.statLabel, { color: textSecondary }]}>
+            Buy-in
+          </Text>
+          <Text style={[styles.statValue, { color: textColor }]}>
+            ${session.buyIn}
+          </Text>
         </View>
         <View style={styles.stat}>
-          <Text style={styles.statLabel}>Cash-out</Text>
-          <Text style={styles.statValue}>${session.cashOut}</Text>
+          <Text style={[styles.statLabel, { color: textSecondary }]}>
+            Cash-out
+          </Text>
+          <Text style={[styles.statValue, { color: textColor }]}>
+            ${session.cashOut}
+          </Text>
         </View>
       </View>
     </Pressable>
@@ -58,12 +92,10 @@ export function SessionCard({ session, onPress }: SessionCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,
     marginVertical: 8,
-    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -83,7 +115,6 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 14,
-    color: '#666',
   },
   details: {
     flexDirection: 'row',
@@ -98,11 +129,9 @@ const styles = StyleSheet.create({
   },
   duration: {
     fontSize: 12,
-    color: '#666',
     marginTop: 4,
   },
   profitContainer: {
-    backgroundColor: '#F2F2F7',
     padding: 8,
     borderRadius: 8,
   },
@@ -114,13 +143,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderTopWidth: 1,
-    borderTopColor: '#F2F2F7',
     paddingTop: 12,
   },
   stat: {},
   statLabel: {
     fontSize: 12,
-    color: '#666',
     marginBottom: 4,
   },
   statValue: {

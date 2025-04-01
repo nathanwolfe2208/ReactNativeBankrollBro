@@ -3,36 +3,40 @@ import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { Platform, View, Text, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 export default function TabLayout() {
-  //const tintColor = useThemeColor('tint');
+  const backgroundColor = useThemeColor('surface');
+  const borderColor = useThemeColor('border');
+  const tintColor = useThemeColor('tint');
+  const tabIconDefaultColor = useThemeColor('tabIconDefault');
 
   return (
     <GestureHandlerRootView>
       <View style={{ flex: 1 }}>
         {/* Persistent Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>BB</Text>
+        <View style={[styles.header, { backgroundColor, borderBottomColor: borderColor }]}>
+          <Text style={[styles.headerTitle, { color: useThemeColor('text') }]}>BB</Text>
         </View>
 
         <Tabs
           screenOptions={{
-            tabBarActiveTintColor: '#cccccc',
-            tabBarInactiveTintColor: '#666666',
+            tabBarActiveTintColor: tintColor,
+            tabBarInactiveTintColor: tabIconDefaultColor,
             headerShown: false,
             tabBarShowLabel: false,
             tabBarStyle: Platform.select({
               ios: {
-                backgroundColor: '#FFFFFF',
+                backgroundColor: backgroundColor,
                 borderTopWidth: 1,
-                borderTopColor: '#E5E5EA',
+                borderTopColor: borderColor,
                 height: 90,
                 paddingBottom: 30,
                 paddingTop: 10,
               },
               default: {
-                backgroundColor: '#FFFFFF',
+                backgroundColor: backgroundColor,
                 borderTopWidth: 1,
-                borderTopColor: '#E5E5EA',
+                borderTopColor: borderColor,
                 height: 65,
                 paddingBottom: 10,
                 paddingTop: 10,

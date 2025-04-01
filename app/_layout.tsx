@@ -4,31 +4,37 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { View, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useActiveTheme } from '@/hooks/useThemeColor';
 
 export default function RootLayout() {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
+  const theme = useActiveTheme();
 
   useEffect(() => {
-    // Add error handling for the initial session check
-    const checkSession = async () => {
+    const initialize = async () => {
       try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-        if (error) {
-          console.error('Error checking session:', error.message);
+        const [sessionResult, onboardingStatus] = await Promise.all([
+          supabase.auth.getSession(),
+          AsyncStorage.getItem('hasCompletedOnboarding'),
+        ]);
+
+        if (sessionResult.error) {
+          console.error('Error checking session:', sessionResult.error.message);
         }
-        setSession(session);
+        
+        setSession(sessionResult.data.session);
+        setHasCompletedOnboarding(onboardingStatus === 'true');
       } catch (error) {
-        console.error('Failed to check session:', error);
+        console.error('Failed to initialize:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkSession();
+    initialize();
 
     const {
       data: { subscription },
@@ -51,14 +57,33 @@ export default function RootLayout() {
 
   return (
     <>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack 
+        screenOptions={{ 
+          headerShown: false,
+          animation: 'slide_from_right',
+          animationDuration: 200,
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          contentStyle: {
+            backgroundColor: theme === 'dark' ? '#000' : '#fff',
+          },
+        }}
+      >
+        <Stack.Screen
+          name="onboarding"
+          options={{
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+          redirect={hasCompletedOnboarding || false}
+        />
         <Stack.Screen
           name="login"
           options={{
             headerShown: false,
             gestureEnabled: false,
           }}
-          redirect={session ? true : false}
+          redirect={!!session || !hasCompletedOnboarding}
         />
         <Stack.Screen
           name="(tabs)"
@@ -66,10 +91,10 @@ export default function RootLayout() {
             headerShown: false,
             gestureEnabled: false,
           }}
-          redirect={!session ? true : false}
+          redirect={!session}
         />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
     </>
   );
 }

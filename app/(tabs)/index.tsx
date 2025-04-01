@@ -14,9 +14,16 @@ import {
 import useSessionsStore from '@/state'; // Import Zustand store
 import { useEffect } from 'react';
 import { StateCard } from '@/components/StatCard';
+import { useActiveTheme } from '../../hooks/useThemeColor';
 
 export default function DashboardScreen() {
+  const backgroundColor = useThemeColor('background');
+  const surfaceColor = useThemeColor('surface');
+  const textColor = useThemeColor('text');
+  const textSecondary = useThemeColor('textSecondary');
+  const borderColor = useThemeColor('border');
   const tintColor = useThemeColor('tint');
+  const theme = useActiveTheme();
   const screenWidth = Dimensions.get('window').width;
 
   // Use Zustand store
@@ -66,21 +73,42 @@ export default function DashboardScreen() {
     fetchSessions();
   }, [fetchSessions]);
 
+  const chartConfig = {
+    backgroundColor: surfaceColor,
+    backgroundGradientFrom: surfaceColor,
+    backgroundGradientTo: surfaceColor,
+    color: (opacity = 1) => tintColor,
+    labelColor: () => textColor,
+    style: {
+      borderRadius: 16,
+    },
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Bankroll Overview</Text>
-        <Text style={styles.balance}>$3,000</Text>
-        <Text style={styles.subtitle}>Total Profit</Text>
+    <ScrollView style={[styles.container, { backgroundColor }]}>
+      <View style={[styles.header, { backgroundColor: surfaceColor }]}>
+        <Text style={[styles.title, { color: textSecondary }]}>
+          Bankroll Overview
+        </Text>
+        <Text style={[styles.balance, { color: textColor }]}>$3,000</Text>
+        <Text style={[styles.subtitle, { color: textSecondary }]}>
+          Total Profit
+        </Text>
       </View>
 
-      <View style={styles.chartContainer}>
+      <View
+        style={[
+          styles.chartContainer,
+          { backgroundColor: surfaceColor, borderColor },
+        ]}
+      >
         {Platform.OS === 'web' ? (
           <View style={{ height: 220, width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
               <WebLineChart
                 data={chartData}
                 margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                style={{ backgroundColor: surfaceColor }}
               >
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -100,16 +128,7 @@ export default function DashboardScreen() {
             data={nativeChartData}
             width={screenWidth - 32}
             height={220}
-            chartConfig={{
-              backgroundColor: '#fff',
-              backgroundGradientFrom: '#fff',
-              backgroundGradientTo: '#fff',
-              decimalPlaces: 0,
-              color: (opacity = 1) => tintColor,
-              style: {
-                borderRadius: 16,
-              },
-            }}
+            chartConfig={chartConfig}
             bezier
             style={{
               marginVertical: 8,
